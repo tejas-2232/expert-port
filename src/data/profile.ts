@@ -11,7 +11,7 @@ I am well versed with Ansible, Terraform, Jenkins, Docker, Linux distros, Python
   birthDate: 'June 1st',
   website: 'https://www.tejasbachhav.cloud',
   email: 'tejasbachhav98@gmail.com',
-  resumePdf: '/files/Tejas_Bachhav_Resume.pdf',
+  resumePdf: '/files/Tejas-Bachhav-Resume.pdf',
   skills: [
     'Ansible',
     'Terraform',
