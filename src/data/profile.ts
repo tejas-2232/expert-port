@@ -16,6 +16,8 @@ I am well versed with Ansible, Terraform, Jenkins, Docker, Linux distros, Python
     'Ansible',
     'Terraform',
     'Amazon EKS',
+    'Agentic AI',
+    'Google ADK',
     'Docker',
     'Kubernetes',
     'AWS S3 Storage',
