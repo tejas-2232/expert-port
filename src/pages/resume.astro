@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ResumeTimeline from '../components/ResumeTimeline.astro';
+import { workExperience, onCampus, education } from '../data/resume';
+---
+<Layout title="Resume | Tejas Bachhav" description="Work experience, on-campus roles, and education for Tejas Bachhav.">
+  <div class="mx-auto max-w-4xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Resume</p>
+    <h1 class="mt-2 text-3xl font-bold text-slate-100">Education & Experience</h1>
+
+    <section class="mt-14">
+      <h2 class="mb-8 text-xl font-semibold text-accent">Work Experience</h2>
+      <ResumeTimeline entries={workExperience} icon="briefcase" />
+    </section>
+
+    <section class="mt-16">
+      <h2 class="mb-8 text-xl font-semibold text-accent">On-Campus Experience</h2>
+      <ResumeTimeline entries={onCampus} icon="user" />
+    </section>
+
+    <section class="mt-16">
+      <h2 class="mb-8 text-xl font-semibold text-accent">Education</h2>
+      <ResumeTimeline entries={education} icon="graduation-cap" />
+    </section>
+  </div>
+</Layout>

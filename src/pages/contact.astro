@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { contactCopy } from '../data/contact';
+---
+<Layout title="Contact | Tejas Bachhav" description="Get in touch with Tejas Bachhav.">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Contact</p>
+    <h1 class="mt-2 text-3xl font-bold text-slate-100">{contactCopy.heading}</h1>
+    <p class="mt-4 text-slate-400">{contactCopy.subtext}</p>
+
+    <div class="mt-12">
+      <ContactForm />
+    </div>
+
+    <div class="mt-16 grid gap-8 sm:grid-cols-2 text-center">
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-300">{contactCopy.locationTitle}</h3>
+        <p class="mt-2 text-slate-400">{contactCopy.locationText}</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-300">{contactCopy.emailTitle}</h3>
+        <a href={`mailto:${contactCopy.email}`} class="mt-2 inline-block text-accent hover:text-accent-hover">{contactCopy.email}</a>
+      </div>
+    </div>
+  </div>
+</Layout>

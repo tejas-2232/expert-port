@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { projects } from '../data/projects';
+---
+<Layout title="Projects | Tejas Bachhav" description="Cloud and DevOps projects: Serverless Resume API, Ansible, Python, HacktoberFest.">
+  <div class="mx-auto max-w-5xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Portfolio</p>
+    <h1 class="mt-2 text-3xl font-bold text-slate-100">Projects & Repositories</h1>
+    <p class="mt-4 text-slate-400">These projects helped me understand the basic building blocks of the underlying structure.</p>
+
+    <div class="mt-12 grid gap-8 sm:grid-cols-2">
+      {projects.map((project) => (
+        <ProjectCard project={project} />
+      ))}
+    </div>
+  </div>
+</Layout>
