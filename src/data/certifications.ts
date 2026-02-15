@@ -14,7 +14,7 @@ export const certifications: Certification[] = [
     year: '2021',
   },
   {
-    name: 'Aviatrix Certified Certifies Network Associate',
+    name: 'Aviatrix Certified Multi-Cloud Network Associate',
     issuer: 'Aviatrix',
     verifyUrl: 'https://www.aviatrix.com/certification',
     year: '2022',
