@@ -1,0 +1,47 @@
+---
+interface Props {
+  email: string;
+  class?: string;
+}
+
+const { email, class: className = '' } = Astro.props;
+---
+<div class={`inline-flex items-center gap-2 ${className}`}>
+  <a href={`mailto:${email}`} class="text-accent hover:text-accent-hover" id="copy-email-link">{email}</a>
+  <button
+    type="button"
+    id="copy-email-btn"
+    data-email={email}
+    class="rounded-md border border-slate-600 bg-slate-800/50 px-2.5 py-1 text-xs font-medium text-slate-300 transition hover:border-accent hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
+    aria-label="Copy email address"
+  >
+    Copy
+  </button>
+  <span id="copy-email-feedback" class="hidden text-xs font-medium text-accent" aria-live="polite">Copied!</span>
+</div>
+
+<script>
+  (function () {
+    const btn = document.getElementById('copy-email-btn');
+    const feedback = document.getElementById('copy-email-feedback');
+    if (!btn || !feedback) return;
+    const email = btn.getAttribute('data-email') || '';
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(email);
+        feedback.classList.remove('hidden');
+        btn.classList.add('hidden');
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          feedback.classList.add('hidden');
+          btn.classList.remove('hidden');
+          timeout = null;
+        }, 2000);
+      } catch {
+        window.location.href = `mailto:${email}`;
+      }
+    });
+  })();
+</script>
