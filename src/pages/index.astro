@@ -1,9 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Terminal from '../components/Terminal.astro';
 import { profile, socials, stats } from '../data/profile';
 import { certifications } from '../data/certifications';
 import { talks } from '../data/talks';
 import { openSource } from '../data/opensource';
+import { getGitHubActivity, formatActivityDate } from '../data/github';
+
+const githubActivity = await getGitHubActivity();
 ---
 <Layout title="Tejas Bachhav | Portfolio" description={profile.bio}>
   <section class="motion-section relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-6 pt-20 pb-32">
@@ -30,6 +34,7 @@ import { openSource } from '../data/opensource';
           Download Resume
         </a>
       </div>
+      <Terminal />
     </div>
     <ul class="absolute bottom-12 left-0 right-0 z-10 flex justify-center gap-8 text-slate-400" role="list">
       {socials.map(({ href, label }) => (
@@ -203,6 +208,52 @@ import { openSource } from '../data/opensource';
       <p class="mt-8 text-center">
         <a href="https://github.com/tejas-2232" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent-hover font-medium">
           View all on GitHub →
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section id="activity" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-6 py-16">
+    <div class="mx-auto max-w-5xl">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Activity</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-100">Recent on GitHub</h2>
+      <p class="mt-2 text-slate-400">Pushes, stars, and contributions (updated on each deploy).</p>
+      {githubActivity.length > 0 ? (
+        <ul class="mt-10 space-y-3">
+          {githubActivity.map((item) => (
+            <li class="motion-card">
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex flex-wrap items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-950/50 px-4 py-3 text-left transition hover:border-accent/40 hover:bg-slate-900/50 sm:flex-nowrap"
+              >
+                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-800 text-accent">
+                  {item.type === 'push' && (
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+                  )}
+                  {item.type === 'create' && (
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                  )}
+                  {item.type === 'star' && (
+                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                  )}
+                  {(item.type === 'fork' || item.type === 'pr' || item.type === 'issue' || item.type === 'other') && (
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  )}
+                </span>
+                <span class="min-w-0 flex-1 text-sm text-slate-200">{item.text}</span>
+                <span class="shrink-0 text-xs text-slate-500">{formatActivityDate(item.date)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-10 text-slate-500">Activity will appear after the next deploy.</p>
+      )}
+      <p class="mt-6">
+        <a href="https://github.com/tejas-2232" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">
+          View profile on GitHub →
         </a>
       </p>
     </div>

@@ -1,9 +1,16 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { getReadingTimeMinutes, formatReadingTime } from '../../utils/reading-time';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const postsWithReadingTime = posts.map((entry) => {
+  const body = 'body' in entry ? (entry as { body?: string }).body : undefined;
+  const minutes = getReadingTimeMinutes(body);
+  return { entry, readingText: formatReadingTime(minutes) };
+});
 ---
 <Layout title="Blog | Tejas Bachhav" description="Technical notes on Terraform, Ansible, DevOps, and cloud.">
   <div class="mx-auto max-w-3xl px-6 py-16">
@@ -12,7 +19,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     <p class="mt-2 text-slate-400">Short posts on Terraform, Ansible, incidents, and cloud.</p>
 
     <ul class="mt-10 space-y-8">
-      {posts.map((entry) => (
+      {postsWithReadingTime.map(({ entry, readingText }) => (
         <li>
           <a
             href={`/blog/${entry.id}`}
@@ -20,9 +27,13 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
           >
             <h2 class="font-semibold text-slate-100">{entry.data.title}</h2>
             <p class="mt-1 text-sm text-slate-400">{entry.data.description}</p>
-            <time class="mt-2 block text-xs text-slate-500" datetime={entry.data.pubDate.toISOString()}>
-              {entry.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-            </time>
+            <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+              <time datetime={entry.data.pubDate.toISOString()}>
+                {entry.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </time>
+              <span aria-hidden="true">·</span>
+              <span>{readingText}</span>
+            </div>
           </a>
         </li>
       ))}

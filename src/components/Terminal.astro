@@ -1,0 +1,116 @@
+---
+const commands = [
+  {
+    command: 'terraform plan',
+    output: 'Terraform will perform the following actions:\n\n  # aws_instance.web will be created\n  + resource "aws_instance" "web" {\n      + ami           = "ami-0c55b159cbfafe1f0"\n      + instance_type = "t3.micro"\n    }\n\nPlan: 1 to add, 0 to change, 0 to destroy.',
+  },
+  {
+    command: 'kubectl get pods',
+    output: 'NAME              READY   STATUS    RESTARTS   AGE\napp-deploy-7d9f   1/1     Running   0          2d\napp-deploy-8x2k   1/1     Running   0          2d',
+  },
+  {
+    command: 'docker ps',
+    output: 'CONTAINER ID   IMAGE          STATUS         PORTS\nabc123def456   nginx:alpine   Up 2 hours   0.0.0.0:80->80/tcp\n789ghi012jkl   redis:7       Up 1 day     6379/tcp',
+  },
+  {
+    command: 'ansible-playbook deploy.yml',
+    output: 'PLAY [all] ****\nTASK [Gathering Facts] ****\nok: [localhost]\nTASK [deploy app] ****\nchanged: [localhost]\nPLAY RECAP ****\nlocalhost : ok=2  changed=1',
+  },
+  {
+    command: 'git status',
+    output: 'On branch main\nYour branch is up to date with \'origin/main\'.\n\nnothing to commit, working tree clean',
+  },
+];
+---
+<div class="terminal-window mx-auto mt-12 max-w-2xl overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950/90 shadow-2xl shadow-black/40">
+  <div class="flex items-center gap-2 border-b border-slate-700/60 bg-slate-900/80 px-4 py-3">
+    <span class="h-3 w-3 rounded-full bg-slate-600" aria-hidden="true"></span>
+    <span class="h-3 w-3 rounded-full bg-slate-600" aria-hidden="true"></span>
+    <span class="h-3 w-3 rounded-full bg-slate-600" aria-hidden="true"></span>
+    <span class="ml-2 text-xs text-slate-500">devops@portfolio:~</span>
+  </div>
+  <div class="font-mono text-sm md:text-base">
+    <div class="border-slate-800/80 bg-slate-900/50 px-4 py-4 md:px-5 md:py-5">
+      <div id="terminal-lines" class="max-h-48 min-h-[4.5rem] overflow-y-auto space-y-2 text-slate-300 [scrollbar-width:thin]"></div>
+      <div id="terminal-current" class="mt-1">
+        <div class="flex items-center gap-0.5" aria-live="polite">
+          <span class="text-slate-500">$</span>
+          <span id="terminal-command" class="text-slate-100"></span>
+          <span id="terminal-cursor" class="inline-block h-4 w-0.5 bg-accent animate-pulse" aria-hidden="true"></span>
+        </div>
+        <pre id="terminal-output" class="mt-1 whitespace-pre overflow-x-auto text-xs text-slate-500 border-slate-700/50 pl-0 hidden"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+<script define:vars={{ commands: JSON.stringify(commands) }}>
+  const cmdList = typeof commands === 'string' ? JSON.parse(commands) : commands;
+  const lineEl = document.getElementById('terminal-lines');
+  const commandEl = document.getElementById('terminal-command');
+  const outputEl = document.getElementById('terminal-output');
+  const cursorEl = document.getElementById('terminal-cursor');
+
+  if (!lineEl || !commandEl || !outputEl || !cursorEl) throw new Error('Terminal elements not found');
+
+  const typeSpeed = 70;
+  const pauseAfterOutput = 2800;
+  const pauseBeforeNext = 800;
+  const maxBlocks = 2;
+
+  function sleep(ms) {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function addBlock(cmd, output) {
+    while (lineEl.children.length >= maxBlocks) {
+      lineEl.firstChild?.remove();
+    }
+    const block = document.createElement('div');
+    block.className = 'terminal-block space-y-0.5';
+    block.innerHTML =
+      '<div class="text-slate-400">' +
+      '<span class="text-slate-500">$</span> ' + escapeHtml(cmd) +
+      '</div>' +
+      '<pre class="whitespace-pre overflow-x-auto text-xs text-slate-500">' + escapeHtml(output) + '</pre>';
+    lineEl.appendChild(block);
+  }
+
+  async function typeCommand(cmd) {
+    commandEl.textContent = '';
+    for (const char of cmd) {
+      commandEl.textContent += char;
+      await sleep(typeSpeed);
+    }
+  }
+
+  async function run() {
+    let index = 0;
+    while (true) {
+      const item = cmdList[index % cmdList.length];
+      const cmd = typeof item === 'string' ? item : item.command;
+      const output = typeof item === 'string' ? '' : (item.output || '');
+      await typeCommand(cmd);
+      if (output) {
+        outputEl.textContent = output;
+        outputEl.classList.remove('hidden');
+        await sleep(pauseAfterOutput);
+      } else {
+        await sleep(1200);
+      }
+      addBlock(cmd, output);
+      commandEl.textContent = '';
+      outputEl.textContent = '';
+      outputEl.classList.add('hidden');
+      await sleep(pauseBeforeNext);
+      index += 1;
+    }
+  }
+
+  run();
+</script>
