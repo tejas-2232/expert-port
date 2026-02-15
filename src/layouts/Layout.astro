@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ViewTransitions } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import BackToTop from '../components/BackToTop.astro';
@@ -23,6 +24,7 @@ const { title, description = "Tejas Bachhav – Cloud DevOps Engineer. Master's 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>{title}</title>
+    <ViewTransitions />
     <script is:inline>
       (function(){var k='portfolio-theme';var s=typeof document!=='undefined'?localStorage.getItem(k):null;var d=typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;var light=s==='light'||(s===null&&!d);if(light)document.documentElement.classList.add('light');})();
     </script>

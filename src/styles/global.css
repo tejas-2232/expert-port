@@ -32,3 +32,40 @@ html.light .ring-slate-700 { --tw-ring-color: #cbd5e1; }
 html.light .focus\:ring-offset-slate-950:focus { --tw-ring-offset-color: #f8fafc; }
 html.light #theme-toggle { color: #475569; }
 html.light #theme-toggle:hover { background: #e2e8f0; color: #0f172a; }
+
+/* Talks gallery: modern scrollbar and smooth scroll */
+.talks-gallery {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) rgba(30, 41, 59, 0.6);
+}
+html.light .talks-gallery {
+  scrollbar-color: var(--color-accent) rgba(226, 232, 240, 0.8);
+}
+.talks-gallery::-webkit-scrollbar {
+  height: 8px;
+}
+.talks-gallery::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 4px;
+}
+.talks-gallery::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
+.talks-gallery::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-hover);
+}
+html.light .talks-gallery::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.6);
+}
+
+/* Talks section: light theme card and fade */
+html.light .talks-gallery-fade {
+  background: linear-gradient(to left, rgba(248, 250, 252, 0.95), transparent);
+}
+html.light .talks-gallery-bg {
+  background: rgba(241, 245, 249, 0.7);
+}
+html.light section#talks li {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+}

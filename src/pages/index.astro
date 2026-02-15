@@ -127,35 +127,46 @@ import { openSource } from '../data/opensource';
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Speaking</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Talks & Workshops</h2>
       <p class="mt-2 text-slate-400">Presentations at meetups and campus events.</p>
-      <ul class="mt-10 space-y-8">
+      <ul class="mt-10 space-y-10">
         {talks.map((talk) => (
-          <li class="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-950/50">
+          <li class="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-950/50 shadow-xl shadow-black/20">
             {talk.images && talk.images.length > 0 && (
-              <div class="relative w-full">
-                <div class="flex snap-x gap-4 overflow-x-auto overscroll-x-contain px-4 py-4 scroll-smooth pb-2 md:px-5 [scrollbar-width:thin]" role="region" aria-label={`Images for ${talk.title}`}>
+              <div class="talks-gallery-bg relative bg-slate-900/80">
+                <div class="talks-gallery flex snap-x gap-4 overflow-x-auto overscroll-x-contain px-5 py-5 scroll-smooth md:gap-5 md:px-6 md:py-6" role="region" aria-label={`Images for ${talk.title}`}>
                   {talk.images.map((src, i) => (
-                    <img
-                      key={src + i}
-                      src={src}
-                      alt={`${talk.title} – image ${i + 1}`}
-                      class="h-44 w-72 shrink-0 snap-center rounded-lg object-cover shadow-md"
-                      loading="lazy"
-                    />
+                    <div class="relative h-52 w-72 shrink-0 snap-center overflow-hidden rounded-xl md:h-60 md:w-80">
+                      <img
+                        key={src + i}
+                        src={src}
+                        alt={`${talk.title} – image ${i + 1}`}
+                        class="h-full w-full object-cover transition duration-300 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div class="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10" aria-hidden="true" />
+                    </div>
                   ))}
                 </div>
+                <div class="talks-gallery-fade pointer-events-none absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-900/90 to-transparent md:w-24" aria-hidden="true" />
               </div>
             )}
-            <div class="flex flex-col gap-3 border-t border-slate-700/50 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-col gap-4 border-t border-slate-700/50 p-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 class="font-semibold text-slate-100">{talk.title}</h3>
-                <p class="text-sm text-slate-400">{talk.event} · {talk.date}</p>
+                <h3 class="text-lg font-semibold text-slate-100">{talk.title}</h3>
+                <p class="mt-1 text-sm text-slate-400">{talk.event}</p>
+                <p class="mt-0.5 text-xs text-slate-500">{talk.date}</p>
               </div>
-              <div class="flex flex-wrap gap-3">
+              <div class="flex flex-wrap gap-2">
                 {talk.slidesUrl && (
-                  <a href={talk.slidesUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">Slides</a>
+                  <a href={talk.slidesUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/25 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.5a2 2 0 012 2v5.5a2 2 0 01-2 2z" /></svg>
+                    Slides
+                  </a>
                 )}
                 {talk.videoUrl && (
-                  <a href={talk.videoUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">Video</a>
+                  <a href={talk.videoUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/25 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950">
+                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                    Video
+                  </a>
                 )}
               </div>
             </div>
