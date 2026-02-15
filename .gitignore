@@ -3,6 +3,9 @@ dist/
 # generated types
 .astro/
 
+.planned-features.txt
+astro-website-cursor-chat.md
+
 # dependencies
 node_modules/
 
