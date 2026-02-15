@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ContactForm from '../components/ContactForm.astro';
+import CopyEmail from '../components/CopyEmail.astro';
 import { contactCopy } from '../data/contact';
 ---
 <Layout title="Contact | Tejas Bachhav" description="Get in touch with Tejas Bachhav.">
@@ -20,7 +21,9 @@ import { contactCopy } from '../data/contact';
       </div>
       <div>
         <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-300">{contactCopy.emailTitle}</h3>
-        <a href={`mailto:${contactCopy.email}`} class="mt-2 inline-block text-accent hover:text-accent-hover">{contactCopy.email}</a>
+        <div class="mt-2">
+          <CopyEmail email={contactCopy.email} />
+        </div>
       </div>
     </div>
   </div>
