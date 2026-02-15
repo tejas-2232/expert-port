@@ -1,6 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { profile, socials, stats } from '../data/profile';
+import { certifications } from '../data/certifications';
+import { talks } from '../data/talks';
+import { openSource } from '../data/opensource';
 ---
 <Layout title="Tejas Bachhav | Portfolio" description={profile.bio}>
   <section class="relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-6 pt-20 pb-32">
@@ -90,6 +93,90 @@ import { profile, socials, stats } from '../data/profile';
         <a href="/contact" class="rounded-lg border-2 border-accent px-6 py-3 text-sm font-medium text-accent transition hover:bg-accent/10">Hire Me</a>
         <a href={profile.resumePdf} class="rounded-lg bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-hover">Download Resume</a>
       </div>
+    </div>
+  </section>
+
+  <section id="certifications" class="border-t border-slate-800/50 bg-slate-950 px-6 py-16">
+    <div class="mx-auto max-w-5xl">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Credentials</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-100">Certifications & Badges</h2>
+      <p class="mt-2 text-slate-400">Cloud and DevOps certifications with verification links.</p>
+      <div class="mt-10 flex flex-wrap gap-6">
+        {certifications.map((cert) => (
+          <a
+            href={cert.verifyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex flex-col rounded-xl border border-slate-700/50 bg-slate-900/50 p-5 transition hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5 sm:min-w-[240px]"
+          >
+            <span class="font-semibold text-slate-100 group-hover:text-accent transition">{cert.name}</span>
+            <span class="mt-1 text-sm text-slate-400">{cert.issuer}</span>
+            {cert.year && <span class="mt-1 text-xs text-slate-500">{cert.year}</span>}
+            <span class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent">
+              Verify
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="talks" class="border-t border-slate-800/50 bg-slate-900/50 px-6 py-16">
+    <div class="mx-auto max-w-5xl">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Speaking</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-100">Talks & Workshops</h2>
+      <p class="mt-2 text-slate-400">Presentations at meetups and campus events.</p>
+      <ul class="mt-10 space-y-6">
+        {talks.map((talk) => (
+          <li class="flex flex-col gap-2 rounded-xl border border-slate-700/50 bg-slate-950/50 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 class="font-semibold text-slate-100">{talk.title}</h3>
+              <p class="text-sm text-slate-400">{talk.event} · {talk.date}</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              {talk.slidesUrl && (
+                <a href={talk.slidesUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">Slides</a>
+              )}
+              {talk.videoUrl && (
+                <a href={talk.videoUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">Video</a>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section id="opensource" class="border-t border-slate-800/50 bg-slate-950 px-6 py-16">
+    <div class="mx-auto max-w-5xl">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Community</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-100">Open Source</h2>
+      <p class="mt-2 text-slate-400">Repos I maintain, contributions, and HacktoberFest.</p>
+      <ul class="mt-10 grid gap-6 sm:grid-cols-2">
+        {openSource.map((entry) => (
+          <li>
+            <a
+              href={entry.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block rounded-xl border border-slate-700/50 bg-slate-900/50 p-5 transition hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5"
+            >
+              <span class="inline-block rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-accent">
+                {entry.type === 'maintainer' ? 'Maintainer' : entry.type === 'hacktoberfest' ? 'HacktoberFest' : 'Contributor'}
+              </span>
+              <h3 class="mt-2 font-semibold text-slate-100">{entry.title}</h3>
+              <p class="mt-1 text-sm text-slate-400">{entry.description}</p>
+              {entry.year && <span class="mt-2 block text-xs text-slate-500">{entry.year}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="mt-8 text-center">
+        <a href="https://github.com/tejas-2232" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent-hover font-medium">
+          View all on GitHub →
+        </a>
+      </p>
     </div>
   </section>
 
