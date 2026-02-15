@@ -127,20 +127,37 @@ import { openSource } from '../data/opensource';
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Speaking</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Talks & Workshops</h2>
       <p class="mt-2 text-slate-400">Presentations at meetups and campus events.</p>
-      <ul class="mt-10 space-y-6">
+      <ul class="mt-10 space-y-8">
         {talks.map((talk) => (
-          <li class="flex flex-col gap-2 rounded-xl border border-slate-700/50 bg-slate-950/50 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 class="font-semibold text-slate-100">{talk.title}</h3>
-              <p class="text-sm text-slate-400">{talk.event} · {talk.date}</p>
-            </div>
-            <div class="flex flex-wrap gap-3">
-              {talk.slidesUrl && (
-                <a href={talk.slidesUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">Slides</a>
-              )}
-              {talk.videoUrl && (
-                <a href={talk.videoUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">Video</a>
-              )}
+          <li class="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-950/50">
+            {talk.images && talk.images.length > 0 && (
+              <div class="relative w-full">
+                <div class="flex snap-x gap-4 overflow-x-auto overscroll-x-contain px-4 py-4 scroll-smooth pb-2 md:px-5 [scrollbar-width:thin]" role="region" aria-label={`Images for ${talk.title}`}>
+                  {talk.images.map((src, i) => (
+                    <img
+                      key={src + i}
+                      src={src}
+                      alt={`${talk.title} – image ${i + 1}`}
+                      class="h-44 w-72 shrink-0 snap-center rounded-lg object-cover shadow-md"
+                      loading="lazy"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div class="flex flex-col gap-3 border-t border-slate-700/50 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="font-semibold text-slate-100">{talk.title}</h3>
+                <p class="text-sm text-slate-400">{talk.event} · {talk.date}</p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                {talk.slidesUrl && (
+                  <a href={talk.slidesUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">Slides</a>
+                )}
+                {talk.videoUrl && (
+                  <a href={talk.videoUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">Video</a>
+                )}
+              </div>
             </div>
           </li>
         ))}

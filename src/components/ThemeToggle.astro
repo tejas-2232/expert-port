@@ -1,0 +1,59 @@
+---
+---
+<button
+  type="button"
+  id="theme-toggle"
+  class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
+  aria-label="Toggle dark/light theme"
+  title="Toggle theme"
+>
+  <span id="theme-icon-dark" aria-hidden="true">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+  </span>
+  <span id="theme-icon-light" class="hidden" aria-hidden="true">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+  </span>
+</button>
+
+<script>
+  (function() {
+    const STORAGE_KEY = 'portfolio-theme';
+    const getStored = () => typeof document !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+    const setStored = (v) => { try { localStorage.setItem(STORAGE_KEY, v); } catch (e) {} };
+
+    function applyTheme(isLight) {
+      const html = document.documentElement;
+      if (isLight) {
+        html.classList.add('light');
+        html.removeAttribute('data-color-scheme');
+      } else {
+        html.classList.remove('light');
+        html.setAttribute('data-color-scheme', 'dark');
+      }
+      const darkIcon = document.getElementById('theme-icon-dark');
+      const lightIcon = document.getElementById('theme-icon-light');
+      if (darkIcon) darkIcon.classList.toggle('hidden', isLight);
+      if (lightIcon) lightIcon.classList.toggle('hidden', !isLight);
+    }
+
+    function init() {
+      const stored = getStored();
+      const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isLight = stored === 'light' || (stored === null && !prefersDark);
+      applyTheme(isLight);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const isLight = document.documentElement.classList.contains('light');
+      const next = !isLight;
+      applyTheme(next);
+      setStored(next ? 'light' : 'dark');
+    });
+  })();
+</script>

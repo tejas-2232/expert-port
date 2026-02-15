@@ -1,0 +1,28 @@
+---
+---
+<a
+  href="#top"
+  id="back-to-top"
+  class="fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-accent text-white opacity-0 shadow-lg transition hover:bg-accent-hover focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950 pointer-events-none"
+  aria-label="Back to top"
+  title="Back to top"
+>
+  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+  </svg>
+</a>
+
+<script>
+  (function() {
+    const el = document.getElementById('back-to-top');
+    if (!el) return;
+    const showAfter = 400;
+    function update() {
+      const show = window.scrollY > showAfter;
+      el.classList.toggle('opacity-0', !show);
+      el.classList.toggle('pointer-events-none', !show);
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>

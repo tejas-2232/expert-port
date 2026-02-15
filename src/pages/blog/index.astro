@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<Layout title="Blog | Tejas Bachhav" description="Technical notes on Terraform, Ansible, DevOps, and cloud.">
+  <div class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Blog</p>
+    <h1 class="mt-2 text-3xl font-bold text-slate-100">Technical notes</h1>
+    <p class="mt-2 text-slate-400">Short posts on Terraform, Ansible, incidents, and cloud.</p>
+
+    <ul class="mt-10 space-y-8">
+      {posts.map((entry) => (
+        <li>
+          <a
+            href={`/blog/${entry.id}`}
+            class="block rounded-xl border border-slate-700/50 bg-slate-950/50 p-5 transition hover:border-accent/50"
+          >
+            <h2 class="font-semibold text-slate-100">{entry.data.title}</h2>
+            <p class="mt-1 text-sm text-slate-400">{entry.data.description}</p>
+            <time class="mt-2 block text-xs text-slate-500" datetime={entry.data.pubDate.toISOString()}>
+              {entry.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+            </time>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Layout>

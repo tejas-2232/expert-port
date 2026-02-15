@@ -2,11 +2,28 @@
 import Layout from '../layouts/Layout.astro';
 import ResumeTimeline from '../components/ResumeTimeline.astro';
 import { workExperience, onCampus, education } from '../data/resume';
+import { profile } from '../data/profile';
 ---
 <Layout title="Resume | Tejas Bachhav" description="Work experience, on-campus roles, and education for Tejas Bachhav.">
   <div class="mx-auto max-w-4xl px-6 py-16">
     <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Resume</p>
     <h1 class="mt-2 text-3xl font-bold text-slate-100">Education & Experience</h1>
+
+    <div class="mt-8 flex flex-wrap gap-4 rounded-xl border border-slate-700/50 bg-slate-900/50 p-5">
+      <p class="w-full text-sm font-medium text-slate-300">Download resume</p>
+      <a
+        href={profile.resumePdfOnePage}
+        class="inline-flex items-center gap-2 rounded-lg border-2 border-accent px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/10"
+      >
+        One-page summary
+      </a>
+      <a
+        href={profile.resumePdfFull}
+        class="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover"
+      >
+        Full resume (PDF)
+      </a>
+    </div>
 
     <section class="mt-14">
       <h2 class="mb-8 text-xl font-semibold text-accent">Work Experience</h2>
