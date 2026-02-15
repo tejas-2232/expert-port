@@ -10,36 +10,36 @@ import { getGitHubActivity, formatActivityDate } from '../data/github';
 const githubActivity = await getGitHubActivity();
 ---
 <Layout title="Tejas Bachhav | Portfolio" description={profile.bio}>
-  <section class="motion-section relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-6 pt-20 pb-32">
+  <section class="motion-section relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-4 pt-20 pb-16 sm:px-6 md:pb-32">
     <div class="absolute inset-0 bg-slate-950/45 bg-gradient-to-b from-slate-950/65 via-slate-900/50 to-slate-950" aria-hidden="true" />
     <div class="relative z-10 mx-auto max-w-4xl text-center">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Hey there</p>
-      <h1 class="mt-4 text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl md:text-6xl">
+      <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-100 sm:text-4xl md:text-5xl lg:text-6xl">
         I<span class="text-accent">'</span>m {profile.name}
       </h1>
-      <p class="mt-6 text-lg text-slate-400">
+      <p class="mt-4 text-base text-slate-400 sm:mt-6 sm:text-lg">
         {profile.taglines.join(' | ')}
       </p>
-      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10 sm:gap-4">
         <a
           href="/resume"
-          class="inline-flex items-center rounded-lg border-2 border-accent px-6 py-3 text-sm font-medium text-accent transition hover:bg-accent/10 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
+          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border-2 border-accent px-5 py-3 text-sm font-medium text-accent transition hover:bg-accent/10 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
         >
           More About Me
         </a>
         <a
           href={profile.resumePdf}
-          class="inline-flex items-center rounded-lg bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
+          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-medium text-white transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
         >
           Download Resume
         </a>
       </div>
       <Terminal />
     </div>
-    <ul class="absolute bottom-12 left-0 right-0 z-10 flex justify-center gap-8 text-slate-400" role="list">
+    <ul class="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4 px-4 sm:gap-6 md:absolute md:bottom-12 md:left-0 md:right-0 md:mt-0 md:gap-8" role="list">
       {socials.map(({ href, label }) => (
         <li>
-          <a href={href} target="_blank" rel="noopener noreferrer" class="text-xl transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950 rounded" aria-label={label}>
+          <a href={href} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded text-lg text-slate-400 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950 sm:text-xl" aria-label={label}>
             {label}
           </a>
         </li>
@@ -47,7 +47,7 @@ const githubActivity = await getGitHubActivity();
     </ul>
   </section>
 
-  <section class="border-t border-slate-800/50 bg-slate-900/50 px-6 py-16">
+  <section class="border-t border-slate-800/50 bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">About</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Let me introduce myself.</h2>
@@ -94,14 +94,14 @@ const githubActivity = await getGitHubActivity();
           </div>
         </div>
       </div>
-      <div class="mt-12 flex flex-wrap justify-center gap-4">
-        <a href="/contact" class="rounded-lg border-2 border-accent px-6 py-3 text-sm font-medium text-accent transition hover:bg-accent/10">Hire Me</a>
-        <a href={profile.resumePdf} class="rounded-lg bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-hover">Download Resume</a>
+      <div class="mt-12 flex flex-wrap justify-center gap-3 sm:gap-4">
+        <a href="/contact" class="inline-flex min-h-[44px] items-center justify-center rounded-lg border-2 border-accent px-6 py-3 text-sm font-medium text-accent transition hover:bg-accent/10 focus:outline-none focus:ring-2 focus:ring-accent">Hire Me</a>
+        <a href={profile.resumePdf} class="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent">Download Resume</a>
       </div>
     </div>
   </section>
 
-  <section id="certifications" class="motion-section border-t border-slate-800/50 bg-slate-950 px-6 py-16">
+  <section id="certifications" class="motion-section border-t border-slate-800/50 bg-slate-950 px-4 py-12 sm:px-6 sm:py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Credentials</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Certifications & Badges</h2>
@@ -127,7 +127,7 @@ const githubActivity = await getGitHubActivity();
     </div>
   </section>
 
-  <section id="talks" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-6 py-16">
+  <section id="talks" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Speaking</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Talks & Workshops</h2>
@@ -181,7 +181,7 @@ const githubActivity = await getGitHubActivity();
     </div>
   </section>
 
-  <section id="opensource" class="motion-section border-t border-slate-800/50 bg-slate-950 px-6 py-16">
+  <section id="opensource" class="motion-section border-t border-slate-800/50 bg-slate-950 px-4 py-12 sm:px-6 sm:py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Community</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Open Source</h2>
@@ -213,7 +213,7 @@ const githubActivity = await getGitHubActivity();
     </div>
   </section>
 
-  <section id="activity" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-6 py-16">
+  <section id="activity" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Activity</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Recent on GitHub</h2>
@@ -259,7 +259,7 @@ const githubActivity = await getGitHubActivity();
     </div>
   </section>
 
-  <section class="motion-section border-t border-slate-800/50 bg-gradient-to-b from-slate-800/30 to-slate-950 px-6 py-16">
+  <section class="motion-section border-t border-slate-800/50 bg-gradient-to-b from-slate-800/30 to-slate-950 px-4 py-12 sm:px-6 sm:py-16">
     <div class="mx-auto max-w-5xl">
       <div class="grid gap-8 sm:grid-cols-3 text-center">
         {stats.map(({ value, label }) => (

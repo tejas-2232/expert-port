@@ -20,39 +20,37 @@ const links = [
 ];
 ---
 <header class="sticky top-0 z-50 w-full border-b border-slate-800/50 bg-slate-950/90 backdrop-blur-md">
-  <nav class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4" aria-label="Main">
-    <a href="/" class="text-lg font-semibold text-slate-100 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950">
+  <nav class="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4" aria-label="Main">
+    <a href="/" class="inline-flex min-h-[44px] min-w-[44px] items-center text-lg font-semibold text-slate-100 transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950">
       Tejas B.
     </a>
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2 md:gap-3">
       <ThemeToggle />
       <button
         type="button"
         id="nav-toggle"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate-300 hover:bg-slate-800 hover:text-white md:hidden"
-      aria-expanded="false"
-      aria-controls="nav-menu"
-    >
-      <span class="sr-only">Open menu</span>
-      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
+        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-slate-300 hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950 md:hidden"
+        aria-expanded="false"
+        aria-controls="nav-menu"
+      >
+        <span class="sr-only">Open menu</span>
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     <ul
       id="nav-menu"
-      class="absolute right-4 top-full mt-2 flex w-56 flex-col gap-1 rounded-lg border border-slate-800 bg-slate-900 p-2 opacity-0 transition md:static md:mt-0 md:w-auto md:flex-row md:gap-0 md:border-0 md:bg-transparent md:p-0 md:opacity-100 [&.open]:opacity-100"
+      class="absolute right-2 top-full z-[60] mt-2 flex w-[calc(100vw-2rem)] max-w-72 flex-col gap-0 rounded-lg border border-slate-800 bg-slate-900 p-2 opacity-0 transition pointer-events-none md:pointer-events-auto md:static md:mt-0 md:w-auto md:max-w-none md:flex-row md:gap-0 md:border-0 md:bg-transparent md:p-0 md:opacity-100 [&.open]:opacity-100 [&.open]:pointer-events-auto"
       role="list"
     >
       {links.map(({ href, label }) => {
         const isCurrent = currentPath === href || (href !== '/' && currentPath.startsWith(href));
+        const linkClass = isCurrent
+          ? 'nav-link flex min-h-[44px] items-center rounded-md px-4 py-3 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950 md:min-h-0 md:py-2 md:rounded-none text-accent'
+          : 'nav-link flex min-h-[44px] items-center rounded-md px-4 py-3 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950 md:min-h-0 md:py-2 md:rounded-none text-slate-300 hover:bg-slate-800 hover:text-white md:bg-transparent';
         return (
           <li>
-            <a
-              href={href}
-              class={`block rounded-md px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950 md:rounded-none md:py-2 ${
-                isCurrent ? 'text-accent' : 'text-slate-300 hover:bg-slate-800 hover:text-white md:bg-transparent'
-              }`}
-            >
+            <a href={href} class={linkClass}>
               {label}
             </a>
           </li>
@@ -64,12 +62,29 @@ const links = [
 </header>
 
 <script>
-  document.getElementById('nav-toggle')?.addEventListener('click', () => {
+  (function() {
+    const toggle = document.getElementById('nav-toggle');
     const menu = document.getElementById('nav-menu');
-    const btn = document.getElementById('nav-toggle');
-    if (menu && btn) {
-      menu.classList.toggle('open');
-      btn.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
+    if (!toggle || !menu) return;
+
+    function closeMenu() {
+      menu.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
     }
-  });
+
+    toggle.addEventListener('click', () => {
+      const isOpen = menu.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    menu.querySelectorAll('.nav-link').forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (menu.classList.contains('open') && !menu.contains(e.target) && !toggle.contains(e.target)) {
+        closeMenu();
+      }
+    });
+  })();
 </script>

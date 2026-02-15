@@ -5,21 +5,21 @@ import { workExperience, onCampus, education } from '../data/resume';
 import { profile } from '../data/profile';
 ---
 <Layout title="Resume | Tejas Bachhav" description="Work experience, on-campus roles, and education for Tejas Bachhav.">
-  <div class="mx-auto max-w-4xl px-6 py-16">
+  <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
     <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Resume</p>
-    <h1 class="mt-2 text-3xl font-bold text-slate-100">Education & Experience</h1>
+    <h1 class="mt-2 text-2xl font-bold text-slate-100 sm:text-3xl">Education & Experience</h1>
 
-    <div class="mt-8 flex flex-wrap gap-4 rounded-xl border border-slate-700/50 bg-slate-900/50 p-5">
+    <div class="mt-8 flex flex-wrap gap-3 rounded-xl border border-slate-700/50 bg-slate-900/50 p-4 sm:gap-4 sm:p-5">
       <p class="w-full text-sm font-medium text-slate-300">Download resume</p>
       <a
         href={profile.resumePdfOnePage}
-        class="inline-flex items-center gap-2 rounded-lg border-2 border-accent px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/10"
+        class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border-2 border-accent px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/10 focus:outline-none focus:ring-2 focus:ring-accent"
       >
         One-page summary
       </a>
       <a
         href={profile.resumePdfFull}
-        class="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover"
+        class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent"
       >
         Full resume (PDF)
       </a>

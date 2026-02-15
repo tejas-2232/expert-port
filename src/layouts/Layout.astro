@@ -29,7 +29,7 @@ const { title, description = "Tejas Bachhav – Cloud DevOps Engineer. Master's 
       (function(){var k='portfolio-theme';var s=typeof document!=='undefined'?localStorage.getItem(k):null;var d=typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;var light=s==='light'||(s===null&&!d);if(light)document.documentElement.classList.add('light');})();
     </script>
   </head>
-  <body class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased" id="top">
+  <body class="min-h-screen overflow-x-hidden bg-slate-950 text-slate-100 font-sans antialiased" id="top">
     <Nav currentPath={Astro.url.pathname} />
     <main>
       <slot />

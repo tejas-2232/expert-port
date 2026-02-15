@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Prevent horizontal scroll on mobile; ensure tap targets work */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
 @theme {
   --color-accent: #06b6d4;
   --color-accent-hover: #22d3ee;
