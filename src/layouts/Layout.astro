@@ -36,5 +36,34 @@ const { title, description = "Tejas Bachhav – Cloud DevOps Engineer. Master's 
     </main>
     <Footer />
     <BackToTop />
+    <script>
+      import { animate, stagger, inView } from 'motion';
+
+      if (typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll('.motion-section').forEach((el) => {
+          const h = el as HTMLElement;
+          h.style.opacity = '0';
+          h.style.transform = 'translateY(24px)';
+        });
+        document.querySelectorAll('.motion-card').forEach((el) => {
+          const h = el as HTMLElement;
+          h.style.opacity = '0';
+          h.style.transform = 'translateY(25px)';
+        });
+
+        inView(
+          '.motion-section',
+          (element) => {
+            animate(element, { opacity: [0, 1], y: [24, 0] }, { duration: 0.6, ease: [0.39, 0.24, 0.3, 1] });
+
+            const cards = element.querySelectorAll('.motion-card');
+            if (cards.length > 0) {
+              animate(cards, { opacity: [0, 1], y: [25, 0] }, { type: 'spring', delay: stagger(0.12, { startDelay: 0.15 }) });
+            }
+          },
+          { amount: 0.25 }
+        );
+      }
+    </script>
   </body>
 </html>

@@ -6,7 +6,7 @@ import { talks } from '../data/talks';
 import { openSource } from '../data/opensource';
 ---
 <Layout title="Tejas Bachhav | Portfolio" description={profile.bio}>
-  <section class="relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-6 pt-20 pb-32">
+  <section class="motion-section relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-6 pt-20 pb-32">
     <div class="absolute inset-0 bg-slate-950/45 bg-gradient-to-b from-slate-950/65 via-slate-900/50 to-slate-950" aria-hidden="true" />
     <div class="relative z-10 mx-auto max-w-4xl text-center">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Hey there</p>
@@ -96,7 +96,7 @@ import { openSource } from '../data/opensource';
     </div>
   </section>
 
-  <section id="certifications" class="border-t border-slate-800/50 bg-slate-950 px-6 py-16">
+  <section id="certifications" class="motion-section border-t border-slate-800/50 bg-slate-950 px-6 py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Credentials</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Certifications & Badges</h2>
@@ -107,7 +107,7 @@ import { openSource } from '../data/opensource';
             href={cert.verifyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="group flex flex-col rounded-xl border border-slate-700/50 bg-slate-900/50 p-5 transition hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5 sm:min-w-[240px]"
+            class="motion-card group flex flex-col rounded-xl border border-slate-700/50 bg-slate-900/50 p-5 transition hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5 sm:min-w-[240px]"
           >
             <span class="font-semibold text-slate-100 group-hover:text-accent transition">{cert.name}</span>
             <span class="mt-1 text-sm text-slate-400">{cert.issuer}</span>
@@ -122,7 +122,7 @@ import { openSource } from '../data/opensource';
     </div>
   </section>
 
-  <section id="talks" class="border-t border-slate-800/50 bg-slate-900/50 px-6 py-16">
+  <section id="talks" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-6 py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Speaking</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Talks & Workshops</h2>
@@ -176,7 +176,7 @@ import { openSource } from '../data/opensource';
     </div>
   </section>
 
-  <section id="opensource" class="border-t border-slate-800/50 bg-slate-950 px-6 py-16">
+  <section id="opensource" class="motion-section border-t border-slate-800/50 bg-slate-950 px-6 py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Community</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Open Source</h2>
@@ -208,11 +208,11 @@ import { openSource } from '../data/opensource';
     </div>
   </section>
 
-  <section class="border-t border-slate-800/50 bg-gradient-to-b from-slate-800/30 to-slate-950 px-6 py-16">
+  <section class="motion-section border-t border-slate-800/50 bg-gradient-to-b from-slate-800/30 to-slate-950 px-6 py-16">
     <div class="mx-auto max-w-5xl">
       <div class="grid gap-8 sm:grid-cols-3 text-center">
         {stats.map(({ value, label }) => (
-          <div class="rounded-xl border border-slate-700/50 bg-slate-900/50 p-6">
+          <div class="motion-card rounded-xl border border-slate-700/50 bg-slate-900/50 p-6">
             <p class="text-3xl font-semibold text-slate-100">{value}</p>
             <p class="mt-1 text-sm text-slate-400">{label}</p>
           </div>
