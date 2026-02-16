@@ -29,7 +29,7 @@ const prevPost = currentIndex >= 0 && currentIndex < sorted.length - 1 ? sorted[
 <Layout title={`${entry.data.title} | Tejas Bachhav`} description={entry.data.description}>
   <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
     <header class="mb-10">
-      <a href="/blog" class="text-sm font-medium text-accent hover:text-accent-hover">← Blog</a>
+      <a href="/blog" class="text-sm font-medium text-orange-400 hover:text-orange-300">← Blog</a>
       <h1 class="mt-4 text-3xl font-bold text-slate-100">{entry.data.title}</h1>
       <p class="mt-2 text-slate-400">{entry.data.description}</p>
       <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
@@ -41,20 +41,20 @@ const prevPost = currentIndex >= 0 && currentIndex < sorted.length - 1 ? sorted[
       </div>
     </header>
 
-    <div class="blog-body text-slate-300 [&_h2]:mt-8 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-slate-100 [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-slate-100 [&_p]:mt-3 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-6 [&_a]:text-accent [&_a]:hover:underline [&_strong]:text-slate-200">
+    <div class="blog-body text-slate-300 [&_h2]:mt-8 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-slate-100 [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-slate-100 [&_p]:mt-3 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-6 [&_a]:text-orange-400 [&_a]:hover:underline [&_strong]:text-slate-200">
       <Content />
     </div>
 
     <nav class="mt-12 flex flex-wrap justify-between gap-4 border-t border-slate-700/50 pt-8">
       {prevPost ? (
-        <a href={`/blog/${prevPost.id}`} class="text-accent hover:text-accent-hover">
+        <a href={`/blog/${prevPost.id}`} class="text-orange-400 hover:text-orange-300">
           ← {prevPost.data.title}
         </a>
       ) : (
         <span />
       )}
       {nextPost ? (
-        <a href={`/blog/${nextPost.id}`} class="text-accent hover:text-accent-hover text-right">
+        <a href={`/blog/${nextPost.id}`} class="text-orange-400 hover:text-orange-300 text-right">
           {nextPost.data.title} →
         </a>
       ) : (

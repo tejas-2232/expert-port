@@ -19,7 +19,7 @@ const path = iconPaths[icon] || iconPaths['briefcase'];
 <div class="space-y-8">
   {entries.map((entry) => (
     <article class="relative flex gap-6 pl-8 before:absolute before:left-[11px] before:top-2 before:h-[calc(100%-2rem)] before:w-px before:bg-slate-700">
-      <div class="absolute left-0 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-white" aria-hidden="true">
+      <div class="absolute left-0 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500 text-white" aria-hidden="true">
         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={path} /></svg>
       </div>
       <div class="flex-1 pb-8">
@@ -28,7 +28,7 @@ const path = iconPaths[icon] || iconPaths['briefcase'];
           <span class="text-sm text-slate-400">{entry.period}</span>
         </div>
         <h4 class="mb-2">
-          <a href={entry.orgUrl} target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent-hover transition font-medium">
+          <a href={entry.orgUrl} target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 transition font-medium">
             {entry.org}
           </a>
         </h4>

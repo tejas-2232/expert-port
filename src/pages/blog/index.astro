@@ -14,7 +14,7 @@ const postsWithReadingTime = posts.map((entry) => {
 ---
 <Layout title="Blog | Tejas Bachhav" description="Technical notes on Terraform, Ansible, DevOps, and cloud.">
   <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Blog</p>
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-orange-400">Blog</p>
     <h1 class="mt-2 text-3xl font-bold text-slate-100">Technical notes</h1>
     <p class="mt-2 text-slate-400">Short posts on Terraform, Ansible, incidents, and cloud.</p>
 
@@ -23,7 +23,7 @@ const postsWithReadingTime = posts.map((entry) => {
         <li>
           <a
             href={`/blog/${entry.id}`}
-            class="block rounded-xl border border-slate-700/50 bg-slate-950/50 p-5 transition hover:border-accent/50"
+            class="block rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-950/10 to-slate-950/50 p-5 transition hover:border-orange-400/50 hover:shadow-lg hover:shadow-orange-500/10"
           >
             <h2 class="font-semibold text-slate-100">{entry.data.title}</h2>
             <p class="mt-1 text-sm text-slate-400">{entry.data.description}</p>

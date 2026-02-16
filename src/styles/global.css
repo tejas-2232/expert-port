@@ -28,7 +28,14 @@ html.light .bg-slate-900\/50 { background-color: rgba(241, 245, 249, 0.6); }
 html.light .bg-slate-950\/50 { background-color: rgba(248, 250, 252, 0.8); }
 html.light header { background: rgba(248, 250, 252, 0.92); border-color: #e2e8f0; }
 html.light header a { color: #0f172a; }
-html.light .rounded-xl.border { border-color: #e2e8f0; background-color: #fff; }
+html.light .rounded-xl.border:not(.gh-stat-card) { border-color: #e2e8f0; background-color: #fff; }
+
+/* GitHub stat cards – light theme: keep colored tints but brighten backgrounds */
+html.light .from-blue-950\/40 { --tw-gradient-from: rgba(219, 234, 254, 0.5); }
+html.light .from-purple-950\/40 { --tw-gradient-from: rgba(243, 232, 255, 0.5); }
+html.light .from-amber-950\/40 { --tw-gradient-from: rgba(254, 243, 199, 0.5); }
+html.light .from-emerald-950\/40 { --tw-gradient-from: rgba(209, 250, 229, 0.5); }
+html.light .to-slate-950\/60 { --tw-gradient-to: rgba(248, 250, 252, 0.7); }
 html.light footer { background: #f1f5f9; border-color: #e2e8f0; }
 html.light footer a, html.light footer span { color: #475569; }
 html.light footer a:hover { color: var(--color-accent); }
