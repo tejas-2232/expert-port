@@ -5,9 +5,11 @@ import { profile, socials, stats } from '../data/profile';
 import { certifications } from '../data/certifications';
 import { talks } from '../data/talks';
 import { openSource } from '../data/opensource';
-import { getGitHubActivity, formatActivityDate } from '../data/github';
+import { getGitHubStats, getContributionData, formatHeatmapDate } from '../data/github';
 
-const githubActivity = await getGitHubActivity();
+const githubStats = await getGitHubStats();
+const heatmap = await getContributionData();
+const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]));
 ---
 <Layout title="Tejas Bachhav | Portfolio" description={profile.bio}>
   <section class="motion-section relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-4 pt-20 pb-16 sm:px-6 md:pb-32">
@@ -215,45 +217,114 @@ const githubActivity = await getGitHubActivity();
 
   <section id="activity" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
     <div class="mx-auto max-w-5xl">
-      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Activity</p>
-      <h2 class="mt-2 text-3xl font-bold text-slate-100">Recent on GitHub</h2>
-      <p class="mt-2 text-slate-400">Pushes, stars, and contributions (updated on each deploy).</p>
-      {githubActivity.length > 0 ? (
-        <ul class="mt-10 space-y-3">
-          {githubActivity.map((item) => (
-            <li class="motion-card">
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex flex-wrap items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-950/50 px-4 py-3 text-left transition hover:border-accent/40 hover:bg-slate-900/50 sm:flex-nowrap"
-              >
-                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-800 text-accent">
-                  {item.type === 'push' && (
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
-                  )}
-                  {item.type === 'create' && (
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                  )}
-                  {item.type === 'star' && (
-                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
-                  )}
-                  {(item.type === 'fork' || item.type === 'pr' || item.type === 'issue' || item.type === 'other') && (
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  )}
-                </span>
-                <span class="min-w-0 flex-1 text-sm text-slate-200">{item.text}</span>
-                <span class="shrink-0 text-xs text-slate-500">{formatActivityDate(item.date)}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p class="mt-10 text-slate-500">Activity will appear after the next deploy.</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">GitHub</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-100">Profile & Contributions</h2>
+      <p class="mt-2 text-slate-400">Public stats and activity, refreshed on each deploy.</p>
+
+      {/* ── Stats cards ── */}
+      {githubStats && (
+        <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div class="motion-card rounded-xl border border-slate-700/50 bg-slate-950/50 p-5 text-center transition hover:border-accent/40">
+            <svg class="mx-auto h-5 w-5 text-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+            </svg>
+            <p class="mt-2 text-2xl font-bold text-slate-100">{githubStats.publicRepos}</p>
+            <p class="mt-1 text-xs text-slate-400">Repositories</p>
+          </div>
+          <div class="motion-card rounded-xl border border-slate-700/50 bg-slate-950/50 p-5 text-center transition hover:border-accent/40">
+            <svg class="mx-auto h-5 w-5 text-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+            </svg>
+            <p class="mt-2 text-2xl font-bold text-slate-100">{githubStats.followers}</p>
+            <p class="mt-1 text-xs text-slate-400">Followers</p>
+          </div>
+          <div class="motion-card rounded-xl border border-slate-700/50 bg-slate-950/50 p-5 text-center transition hover:border-accent/40">
+            <svg class="mx-auto h-5 w-5 text-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+            <p class="mt-2 text-2xl font-bold text-slate-100">{githubStats.following}</p>
+            <p class="mt-1 text-xs text-slate-400">Following</p>
+          </div>
+          <div class="motion-card rounded-xl border border-slate-700/50 bg-slate-950/50 p-5 text-center transition hover:border-accent/40">
+            <svg class="mx-auto h-5 w-5 text-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+            </svg>
+            <p class="mt-2 text-2xl font-bold text-slate-100">{githubStats.publicGists}</p>
+            <p class="mt-1 text-xs text-slate-400">Gists</p>
+          </div>
+        </div>
       )}
+
+      {/* ── Contribution heatmap ── */}
+      <div class="mt-10">
+        <div class="heatmap-container rounded-xl border border-slate-700/50 bg-slate-950/50 p-4 sm:p-6">
+          <div class="overflow-x-auto">
+            {/* Month labels */}
+            <div class="flex gap-[3px]">
+              <div class="w-7 shrink-0" />
+              {heatmap.weeks.map((_w, i) => {
+                const label = monthLabelMap.get(i);
+                return (
+                  <span class={`w-3 shrink-0 text-[10px] leading-none text-slate-500${label ? ' overflow-visible whitespace-nowrap' : ''}`}>
+                    {label ?? ''}
+                  </span>
+                );
+              })}
+            </div>
+
+            {/* Heatmap grid */}
+            <div class="mt-[6px] flex gap-[3px]">
+              {/* Day-of-week labels */}
+              <div class="flex flex-col gap-[3px]">
+                <div class="h-3 w-7" />
+                <div class="flex h-3 w-7 items-center text-[10px] leading-none text-slate-500">Mon</div>
+                <div class="h-3 w-7" />
+                <div class="flex h-3 w-7 items-center text-[10px] leading-none text-slate-500">Wed</div>
+                <div class="h-3 w-7" />
+                <div class="flex h-3 w-7 items-center text-[10px] leading-none text-slate-500">Fri</div>
+                <div class="h-3 w-7" />
+              </div>
+
+              {/* Week columns */}
+              {heatmap.weeks.map((week) => (
+                <div class="flex flex-col gap-[3px]">
+                  {week.days.map((day) => (
+                    <div
+                      class="heatmap-cell h-3 w-3 rounded-sm"
+                      data-level={day.level}
+                      title={`${formatHeatmapDate(day.date)}: ${day.count} contribution${day.count !== 1 ? 's' : ''}`}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Legend row */}
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs text-slate-500">
+              {heatmap.totalContributions} contribution{heatmap.totalContributions !== 1 ? 's' : ''} in the last 3 months
+            </span>
+            <div class="flex items-center gap-[3px] text-[10px] text-slate-500">
+              <span class="mr-1">Less</span>
+              {[0, 1, 2, 3, 4].map((lvl) => (
+                <div class="heatmap-cell h-[10px] w-[10px] rounded-sm" data-level={lvl} />
+              ))}
+              <span class="ml-1">More</span>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-[10px] text-slate-600 italic">Based on public activity</p>
+      </div>
+
       <p class="mt-6">
-        <a href="https://github.com/tejas-2232" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-accent hover:text-accent-hover">
-          View profile on GitHub →
+        <a
+          href={githubStats?.profileUrl ?? 'https://github.com/tejas-2232'}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm font-medium text-accent hover:text-accent-hover"
+        >
+          View profile on GitHub &rarr;
         </a>
       </p>
     </div>

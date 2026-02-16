@@ -1,131 +1,173 @@
 /**
- * Fetches public GitHub events at build time for the activity feed.
- * Returns a normalized list of { text, url, date } for display.
+ * GitHub profile stats and contribution heatmap data.
+ * Fetched at build time via the GitHub REST API.
  */
 
 const GITHUB_USER = 'tejas-2232';
-const EVENTS_URL = `https://api.github.com/users/${GITHUB_USER}/events/public?per_page=15`;
+const PROFILE_URL = `https://api.github.com/users/${GITHUB_USER}`;
+const EVENTS_URL = `https://api.github.com/users/${GITHUB_USER}/events/public`;
 
-export interface GitHubActivityItem {
-  text: string;
-  url: string;
-  date: Date;
-  type: 'push' | 'create' | 'star' | 'fork' | 'pr' | 'issue' | 'other';
+// ── Types ────────────────────────────────────────
+
+export interface GitHubStats {
+  publicRepos: number;
+  followers: number;
+  following: number;
+  publicGists: number;
+  profileUrl: string;
 }
 
-function parseEvent(event: {
-  type: string;
-  repo?: { name: string; url?: string };
-  payload?: {
-    ref?: string;
-    ref_type?: string;
-    size?: number;
-    commits?: unknown[];
-    action?: string;
-    pull_request?: { html_url: string };
-    issue?: { html_url: string };
-  };
-  created_at: string;
-}): GitHubActivityItem | null {
-  const repoName = event.repo?.name ?? 'repo';
-  const repoUrl = event.repo?.url
-    ? event.repo.url.replace('api.github.com/repos/', 'github.com/')
-    : `https://github.com/${repoName}`;
-  const date = new Date(event.created_at);
-
-  switch (event.type) {
-    case 'PushEvent': {
-      const commits = event.payload?.commits;
-      const count = Array.isArray(commits) ? commits.length : (event.payload?.size ?? 0);
-      const branch = event.payload?.ref?.replace('refs/heads/', '') ?? 'main';
-      const commitText =
-        count <= 0 ? 'Pushed to' : count === 1 ? 'Pushed 1 commit to' : `Pushed ${count} commits to`;
-      return {
-        text: `${commitText} ${repoName} (${branch})`,
-        url: `${repoUrl}/commits/${branch}`,
-        date,
-        type: 'push',
-      };
-    }
-    case 'CreateEvent': {
-      const refType = event.payload?.ref_type ?? 'resource';
-      const ref = event.payload?.ref ?? '';
-      return {
-        text: `Created ${refType} ${ref ? ref + ' in ' : ''}${repoName}`,
-        url: repoUrl,
-        date,
-        type: 'create',
-      };
-    }
-    case 'WatchEvent':
-      return {
-        text: `Starred ${repoName}`,
-        url: repoUrl,
-        date,
-        type: 'star',
-      };
-    case 'ForkEvent':
-      return {
-        text: `Forked ${repoName}`,
-        url: repoUrl,
-        date,
-        type: 'fork',
-      };
-    case 'PullRequestEvent': {
-      const action = event.payload?.action ?? 'opened';
-      const prUrl = event.payload?.pull_request?.html_url ?? repoUrl;
-      return {
-        text: `${action} a PR in ${repoName}`,
-        url: prUrl,
-        date,
-        type: 'pr',
-      };
-    }
-    case 'IssuesEvent': {
-      const action = event.payload?.action ?? 'opened';
-      const issueUrl = event.payload?.issue?.html_url ?? repoUrl;
-      return {
-        text: `${action} an issue in ${repoName}`,
-        url: issueUrl,
-        date,
-        type: 'issue',
-      };
-    }
-    default:
-      return null;
-  }
+export interface ContributionDay {
+  date: string;
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4;
 }
 
-export async function getGitHubActivity(): Promise<GitHubActivityItem[]> {
+export interface ContributionWeek {
+  days: ContributionDay[];
+}
+
+export interface ContributionData {
+  weeks: ContributionWeek[];
+  totalContributions: number;
+  monthLabels: { label: string; colIndex: number }[];
+}
+
+// ── Profile stats ────────────────────────────────
+
+export async function getGitHubStats(): Promise<GitHubStats | null> {
   try {
-    const res = await fetch(EVENTS_URL, {
+    const res = await fetch(PROFILE_URL, {
       headers: { Accept: 'application/vnd.github.v3+json' },
     });
-    if (!res.ok) return [];
-    const events: unknown[] = await res.json();
-    const items: GitHubActivityItem[] = [];
-    for (const ev of events) {
-      const item = parseEvent(ev as Parameters<typeof parseEvent>[0]);
-      if (item) items.push(item);
-      if (items.length >= 8) break;
-    }
-    return items;
+    if (!res.ok) return null;
+    const data = await res.json();
+    return {
+      publicRepos: data.public_repos ?? 0,
+      followers: data.followers ?? 0,
+      following: data.following ?? 0,
+      publicGists: data.public_gists ?? 0,
+      profileUrl: data.html_url ?? `https://github.com/${GITHUB_USER}`,
+    };
   } catch {
-    return [];
+    return null;
   }
 }
 
-/** Format date as "2h ago", "3d ago", "Jan 15", etc. */
-export function formatActivityDate(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+// ── Contribution heatmap ─────────────────────────
 
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+interface RawEvent {
+  type: string;
+  created_at: string;
+  payload?: {
+    commits?: unknown[];
+    size?: number;
+  };
+}
+
+async function fetchAllEvents(): Promise<RawEvent[]> {
+  const allEvents: RawEvent[] = [];
+  for (let page = 1; page <= 3; page++) {
+    try {
+      const res = await fetch(`${EVENTS_URL}?per_page=100&page=${page}`, {
+        headers: { Accept: 'application/vnd.github.v3+json' },
+      });
+      if (!res.ok) break;
+      const events = await res.json();
+      if (!Array.isArray(events) || events.length === 0) break;
+      allEvents.push(...events);
+    } catch {
+      break;
+    }
+  }
+  return allEvents;
+}
+
+function countContributions(event: RawEvent): number {
+  if (event.type === 'PushEvent') {
+    const commits = event.payload?.commits;
+    return Array.isArray(commits) ? Math.max(commits.length, 1) : (event.payload?.size ?? 1);
+  }
+  return 1;
+}
+
+function computeLevel(count: number): 0 | 1 | 2 | 3 | 4 {
+  if (count === 0) return 0;
+  if (count <= 2) return 1;
+  if (count <= 5) return 2;
+  if (count <= 9) return 3;
+  return 4;
+}
+
+function toDateString(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+export async function getContributionData(): Promise<ContributionData> {
+  const events = await fetchAllEvents();
+
+  const countsByDate: Record<string, number> = {};
+  for (const event of events) {
+    const dateStr = event.created_at?.slice(0, 10);
+    if (!dateStr) continue;
+    countsByDate[dateStr] = (countsByDate[dateStr] ?? 0) + countContributions(event);
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayDay = today.getDay();
+
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - (12 * 7 + todayDay));
+
+  const weeks: ContributionWeek[] = [];
+  let totalContributions = 0;
+  let currentWeek: ContributionDay[] = [];
+  const current = new Date(startDate);
+
+  while (current <= today) {
+    const dateStr = toDateString(current);
+    const count = countsByDate[dateStr] ?? 0;
+    totalContributions += count;
+
+    currentWeek.push({
+      date: dateStr,
+      count,
+      level: computeLevel(count),
+    });
+
+    if (currentWeek.length === 7) {
+      weeks.push({ days: currentWeek });
+      currentWeek = [];
+    }
+
+    current.setDate(current.getDate() + 1);
+  }
+
+  if (currentWeek.length > 0) {
+    weeks.push({ days: currentWeek });
+  }
+
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthLabels: { label: string; colIndex: number }[] = [];
+  let lastMonth = -1;
+
+  for (let w = 0; w < weeks.length; w++) {
+    const firstDay = weeks[w].days[0];
+    if (firstDay) {
+      const month = new Date(firstDay.date + 'T00:00:00').getMonth();
+      if (month !== lastMonth) {
+        monthLabels.push({ label: monthNames[month], colIndex: w });
+        lastMonth = month;
+      }
+    }
+  }
+
+  return { weeks, totalContributions, monthLabels };
+}
+
+/** Format a YYYY-MM-DD string for heatmap tooltips. */
+export function formatHeatmapDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
