@@ -1,6 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Terminal from '../components/Terminal.astro';
+import HeroScene from '../components/HeroScene';
+import ParticleBackground from '../components/ParticleBackground.astro';
+import WaveDivider from '../components/WaveDivider.astro';
 import { profile, socials, stats } from '../data/profile';
 import { certifications } from '../data/certifications';
 import { talks } from '../data/talks';
@@ -12,8 +15,9 @@ const heatmap = await getContributionData();
 const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]));
 ---
 <Layout title="Tejas Bachhav | Portfolio" description={profile.bio}>
-  <section class="motion-section relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-4 pt-20 pb-16 sm:px-6 md:pb-32">
+  <section id="hero" class="motion-section relative min-h-[90vh] overflow-hidden bg-[url('/images/bg.jpg')] bg-cover bg-center bg-no-repeat px-4 pt-20 pb-16 sm:px-6 md:pb-32">
     <div class="absolute inset-0 bg-slate-950/45 bg-gradient-to-b from-slate-950/65 via-slate-900/50 to-slate-950" aria-hidden="true" />
+    <HeroScene client:visible />
     <div class="relative z-10 mx-auto max-w-4xl text-center">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Hey there</p>
       <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-100 sm:text-4xl md:text-5xl lg:text-6xl">
@@ -25,18 +29,17 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
       <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10 sm:gap-4">
         <a
           href="/resume"
-          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border-2 border-accent px-5 py-3 text-sm font-medium text-accent transition hover:bg-accent/10 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
+          class="magnetic-btn inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border-2 border-accent px-5 py-3 text-sm font-medium text-accent transition hover:bg-accent/10 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
         >
           More About Me
         </a>
         <a
           href={profile.resumePdf}
-          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-medium text-white transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
+          class="magnetic-btn inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-medium text-white transition hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-slate-950"
         >
           Download Resume
         </a>
       </div>
-      <Terminal />
     </div>
     <ul class="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4 px-4 sm:gap-6 md:absolute md:bottom-12 md:left-0 md:right-0 md:mt-0 md:gap-8" role="list">
       {socials.map(({ href, label }) => (
@@ -49,8 +52,18 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
     </ul>
   </section>
 
-  <section class="border-t border-slate-800/50 bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
-    <div class="mx-auto max-w-5xl">
+  {/* Terminal — separated from hero so the 3D scene is visible */}
+  <section class="border-t border-slate-800/50 bg-gradient-to-b from-slate-950 to-slate-900/80 px-4 py-10 sm:px-6 sm:py-14">
+    <div class="mx-auto max-w-2xl">
+      <Terminal />
+    </div>
+  </section>
+
+  <WaveDivider color="text-slate-900/50" />
+
+  <section class="relative bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
+    <ParticleBackground class="pointer-events-auto" />
+    <div class="relative z-10 mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">About</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Let me introduce myself.</h2>
       <div class="mt-10 flex flex-col items-center gap-8 sm:flex-row sm:items-start">
@@ -83,7 +96,7 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
           <h3 class="text-lg font-semibold uppercase tracking-wide text-slate-100">Skills & Languages</h3>
           <ul class="mt-3 flex flex-wrap gap-2">
             {profile.skills.map((skill) => (
-              <li><span class="rounded-md bg-slate-800 px-3 py-1 text-sm text-slate-300">{skill}</span></li>
+              <li><span class="skill-pill rounded-md bg-slate-800 px-3 py-1 text-sm text-slate-300 transition-all duration-300">{skill}</span></li>
             ))}
           </ul>
           <div class="mt-6">
@@ -103,7 +116,9 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
     </div>
   </section>
 
-  <section id="certifications" class="motion-section border-t border-slate-800/50 bg-slate-950 px-4 py-12 sm:px-6 sm:py-16">
+  <WaveDivider color="text-slate-950" />
+
+  <section id="certifications" class="motion-section bg-slate-950 px-4 py-12 sm:px-6 sm:py-16">
     <div class="mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">Credentials</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Certifications & Badges</h2>
@@ -114,7 +129,7 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
             href={cert.verifyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="motion-card group flex flex-col rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-950/20 to-slate-900/50 p-5 transition hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-500/10 sm:min-w-[240px]"
+            class="motion-card tilt-card group flex flex-col rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-950/20 to-slate-900/50 p-5 transition hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-500/10 sm:min-w-[240px]"
           >
             <span class="font-semibold text-slate-100 group-hover:text-amber-400 transition">{cert.name}</span>
             <span class="mt-1 text-sm text-slate-400">{cert.issuer}</span>
@@ -195,7 +210,7 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
               href={entry.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="block rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 to-slate-900/50 p-5 transition hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-500/10"
+              class="tilt-card block rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 to-slate-900/50 p-5 transition hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-500/10"
             >
               <span class="inline-block rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
                 {entry.type === 'maintainer' ? 'Maintainer' : entry.type === 'hacktoberfest' ? 'HacktoberFest' : 'Contributor'}
@@ -225,57 +240,57 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
       {githubStats && (
         <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {/* Repositories — Blue */}
-          <div class="motion-card group relative overflow-hidden rounded-xl border border-blue-500/20 bg-gradient-to-br from-blue-950/40 to-slate-950/60 p-5 text-center transition hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/10">
+          <div class="motion-card tilt-card group relative overflow-hidden rounded-xl border border-blue-500/20 bg-gradient-to-br from-blue-950/40 to-slate-950/60 p-5 text-center transition hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/10">
             <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 transition group-hover:opacity-100" />
             <div class="relative">
-              <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
+              <div class="icon-pulse mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
                 <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
                 </svg>
               </div>
-              <p class="mt-3 text-2xl font-bold text-blue-300" data-stat="repos">{githubStats.publicRepos}</p>
+              <p class="mt-3 text-2xl font-bold text-blue-300" data-stat="repos" data-count-up={String(githubStats.publicRepos)}>{githubStats.publicRepos}</p>
               <p class="mt-1 text-xs text-slate-400">Repositories</p>
             </div>
           </div>
 
           {/* Followers — Purple */}
-          <div class="motion-card group relative overflow-hidden rounded-xl border border-purple-500/20 bg-gradient-to-br from-purple-950/40 to-slate-950/60 p-5 text-center transition hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/10">
+          <div class="motion-card tilt-card group relative overflow-hidden rounded-xl border border-purple-500/20 bg-gradient-to-br from-purple-950/40 to-slate-950/60 p-5 text-center transition hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/10">
             <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 transition group-hover:opacity-100" />
             <div class="relative">
-              <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
+              <div class="icon-pulse mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
                 <svg class="h-5 w-5 text-purple-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                 </svg>
               </div>
-              <p class="mt-3 text-2xl font-bold text-purple-300" data-stat="followers">{githubStats.followers}</p>
+              <p class="mt-3 text-2xl font-bold text-purple-300" data-stat="followers" data-count-up={String(githubStats.followers)}>{githubStats.followers}</p>
               <p class="mt-1 text-xs text-slate-400">Followers</p>
             </div>
           </div>
 
           {/* Following — Amber */}
-          <div class="motion-card group relative overflow-hidden rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-950/40 to-slate-950/60 p-5 text-center transition hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-500/10">
+          <div class="motion-card tilt-card group relative overflow-hidden rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-950/40 to-slate-950/60 p-5 text-center transition hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-500/10">
             <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 transition group-hover:opacity-100" />
             <div class="relative">
-              <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
+              <div class="icon-pulse mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
                 <svg class="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                 </svg>
               </div>
-              <p class="mt-3 text-2xl font-bold text-amber-300" data-stat="following">{githubStats.following}</p>
+              <p class="mt-3 text-2xl font-bold text-amber-300" data-stat="following" data-count-up={String(githubStats.following)}>{githubStats.following}</p>
               <p class="mt-1 text-xs text-slate-400">Following</p>
             </div>
           </div>
 
           {/* Gists — Emerald */}
-          <div class="motion-card group relative overflow-hidden rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/40 to-slate-950/60 p-5 text-center transition hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-500/10">
+          <div class="motion-card tilt-card group relative overflow-hidden rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/40 to-slate-950/60 p-5 text-center transition hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-500/10">
             <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 transition group-hover:opacity-100" />
             <div class="relative">
-              <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+              <div class="icon-pulse mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
                 <svg class="h-5 w-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
                 </svg>
               </div>
-              <p class="mt-3 text-2xl font-bold text-emerald-300" data-stat="gists">{githubStats.publicGists}</p>
+              <p class="mt-3 text-2xl font-bold text-emerald-300" data-stat="gists" data-count-up={String(githubStats.publicGists)}>{githubStats.publicGists}</p>
               <p class="mt-1 text-xs text-slate-400">Gists</p>
             </div>
           </div>
@@ -370,8 +385,8 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
           const c = colors[i % colors.length];
           const [borderClass, fromClass, textClass] = c.split(' ');
           return (
-            <div class={`motion-card rounded-xl border ${borderClass} bg-gradient-to-br ${fromClass} to-slate-900/50 p-6`}>
-              <p class={`text-3xl font-semibold ${textClass}`}>{value}</p>
+            <div class={`motion-card tilt-card rounded-xl border ${borderClass} bg-gradient-to-br ${fromClass} to-slate-900/50 p-6`}>
+              <p class={`text-3xl font-semibold ${textClass}`} data-count-up={value}>{value}</p>
               <p class="mt-1 text-sm text-slate-400">{label}</p>
             </div>
           );

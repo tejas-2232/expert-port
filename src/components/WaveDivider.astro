@@ -1,0 +1,42 @@
+---
+interface Props {
+  flip?: boolean;
+  color?: string;
+}
+const { flip = false, color = 'text-slate-950' } = Astro.props;
+---
+<div class:list={["wave-divider w-full overflow-hidden leading-[0]", flip && "rotate-180", color]} aria-hidden="true">
+  <svg
+    class="wave-svg block w-full"
+    viewBox="0 0 1440 60"
+    preserveAspectRatio="none"
+    xmlns="http://www.w3.org/2000/svg"
+    style="height: 40px;"
+  >
+    <path
+      class="wave-path"
+      d="M0,30 C240,55 480,5 720,30 C960,55 1200,5 1440,30 L1440,60 L0,60 Z"
+      fill="currentColor"
+      style="--wave-offset: 0;"
+    />
+  </svg>
+</div>
+
+<style>
+  .wave-path {
+    opacity: 0.6;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .wave-path {
+      animation: wave-drift 8s ease-in-out infinite alternate;
+    }
+  }
+  @keyframes wave-drift {
+    0% {
+      d: path("M0,30 C240,55 480,5 720,30 C960,55 1200,5 1440,30 L1440,60 L0,60 Z");
+    }
+    100% {
+      d: path("M0,25 C240,5 480,50 720,25 C960,5 1200,50 1440,25 L1440,60 L0,60 Z");
+    }
+  }
+</style>

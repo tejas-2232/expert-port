@@ -1,0 +1,167 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+<div class:list={["particle-bg-wrap absolute inset-0 overflow-hidden", className]} aria-hidden="true">
+  <canvas class="particle-canvas block h-full w-full" data-particle-canvas></canvas>
+</div>
+
+<script>
+  function initParticles(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    let width = 0;
+    let height = 0;
+    let animId = 0;
+    let mouseX = -9999;
+    let mouseY = -9999;
+
+    interface Particle {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      r: number;
+      opacity: number;
+    }
+
+    const particles: Particle[] = [];
+    const PARTICLE_COUNT = 55;
+    const CONNECT_DIST = 120;
+    const MOUSE_DIST = 100;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = rect.width;
+      height = rect.height;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function createParticles() {
+      particles.length = 0;
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          r: Math.random() * 1.5 + 0.5,
+          opacity: Math.random() * 0.4 + 0.15,
+        });
+      }
+    }
+
+    function draw() {
+      ctx!.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < particles.length; i++) {
+        const a = particles[i];
+
+        // Mouse repulsion
+        const dmx = a.x - mouseX;
+        const dmy = a.y - mouseY;
+        const distMouse = Math.sqrt(dmx * dmx + dmy * dmy);
+        if (distMouse < MOUSE_DIST && distMouse > 0) {
+          const force = (MOUSE_DIST - distMouse) / MOUSE_DIST * 0.8;
+          a.vx += (dmx / distMouse) * force;
+          a.vy += (dmy / distMouse) * force;
+        }
+
+        // Damping
+        a.vx *= 0.98;
+        a.vy *= 0.98;
+
+        // Keep minimum speed
+        const speed = Math.sqrt(a.vx * a.vx + a.vy * a.vy);
+        if (speed < 0.1) {
+          a.vx += (Math.random() - 0.5) * 0.05;
+          a.vy += (Math.random() - 0.5) * 0.05;
+        }
+
+        a.x += a.vx;
+        a.y += a.vy;
+
+        // Wrap around
+        if (a.x < -10) a.x = width + 10;
+        if (a.x > width + 10) a.x = -10;
+        if (a.y < -10) a.y = height + 10;
+        if (a.y > height + 10) a.y = -10;
+
+        // Draw dot
+        ctx!.beginPath();
+        ctx!.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+        ctx!.fillStyle = `rgba(6, 182, 212, ${a.opacity})`;
+        ctx!.fill();
+
+        // Connect nearby particles
+        for (let j = i + 1; j < particles.length; j++) {
+          const b = particles[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECT_DIST) {
+            const lineOpacity = (1 - dist / CONNECT_DIST) * 0.12;
+            ctx!.beginPath();
+            ctx!.moveTo(a.x, a.y);
+            ctx!.lineTo(b.x, b.y);
+            ctx!.strokeStyle = `rgba(6, 182, 212, ${lineOpacity})`;
+            ctx!.lineWidth = 0.5;
+            ctx!.stroke();
+          }
+        }
+      }
+    }
+
+    let isVisible = true;
+
+    function animate() {
+      if (isVisible) draw();
+      animId = requestAnimationFrame(animate);
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisible = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+
+    const parent = canvas.closest('.particle-bg-wrap');
+    parent?.addEventListener('mousemove', (e: Event) => {
+      const me = e as MouseEvent;
+      const rect = canvas.getBoundingClientRect();
+      mouseX = me.clientX - rect.left;
+      mouseY = me.clientY - rect.top;
+    });
+    parent?.addEventListener('mouseleave', () => {
+      mouseX = -9999;
+      mouseY = -9999;
+    });
+
+    const ro = new ResizeObserver(() => {
+      resize();
+      if (particles.length === 0) createParticles();
+    });
+    ro.observe(canvas);
+
+    resize();
+    createParticles();
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      observer.disconnect();
+      ro.disconnect();
+    };
+  }
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-particle-canvas]').forEach(initParticles);
+</script>

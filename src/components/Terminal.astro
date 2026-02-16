@@ -22,49 +22,104 @@ const commands = [
   },
 ];
 ---
-<div class="terminal-window mx-auto mt-8 w-full max-w-2xl overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950/90 shadow-2xl shadow-black/40 sm:mt-12">
+<div class="terminal-window mx-auto mt-8 w-full max-w-2xl overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950 shadow-2xl shadow-black/40 sm:mt-12">
   <div class="flex items-center gap-2 border-b border-slate-700/60 bg-slate-900/80 px-4 py-3">
-    <span class="h-3 w-3 rounded-full bg-slate-600" aria-hidden="true"></span>
-    <span class="h-3 w-3 rounded-full bg-slate-600" aria-hidden="true"></span>
-    <span class="h-3 w-3 rounded-full bg-slate-600" aria-hidden="true"></span>
-    <span class="ml-2 text-xs text-slate-500">devops@portfolio:~</span>
+    <span class="h-3 w-3 rounded-full bg-red-500/70" aria-hidden="true"></span>
+    <span class="h-3 w-3 rounded-full bg-yellow-500/70" aria-hidden="true"></span>
+    <span class="h-3 w-3 rounded-full bg-green-500/70" aria-hidden="true"></span>
+    <span class="ml-2 text-xs text-slate-400">devops@portfolio:~</span>
   </div>
   <div class="font-mono text-sm md:text-base">
-    <div class="border-slate-800/80 bg-slate-900/50 px-4 py-4 md:px-5 md:py-5">
-      <div id="terminal-lines" class="max-h-48 min-h-[4.5rem] overflow-y-auto space-y-2 text-slate-300 [scrollbar-width:thin]"></div>
+    <div id="terminal-scroll" class="h-56 overflow-y-auto bg-slate-950 px-4 py-4 md:h-64 md:px-5 md:py-5 [scrollbar-width:thin]">
+      <div id="terminal-lines" class="space-y-3"></div>
       <div id="terminal-current" class="mt-1">
-        <div class="flex items-center gap-0.5" aria-live="polite">
-          <span class="text-slate-500">$</span>
-          <span id="terminal-command" class="text-slate-100"></span>
-          <span id="terminal-cursor" class="inline-block h-4 w-0.5 bg-accent animate-pulse" aria-hidden="true"></span>
+        <div class="flex items-center gap-1" aria-live="polite">
+          <span class="term-prompt font-bold">$</span>
+          <span id="terminal-command" class="term-cmd"></span>
+          <span id="terminal-cursor" class="inline-block h-4 w-0.5 bg-green-400 animate-pulse" aria-hidden="true"></span>
         </div>
-        <pre id="terminal-output" class="mt-1 whitespace-pre overflow-x-auto text-xs text-slate-500 border-slate-700/50 pl-0 hidden"></pre>
+        <pre id="terminal-output" class="mt-1 whitespace-pre overflow-x-auto text-sm leading-relaxed pl-0 hidden"></pre>
       </div>
     </div>
   </div>
 </div>
 <script define:vars={{ commands: JSON.stringify(commands) }}>
   const cmdList = typeof commands === 'string' ? JSON.parse(commands) : commands;
+  const scrollEl = document.getElementById('terminal-scroll');
   const lineEl = document.getElementById('terminal-lines');
   const commandEl = document.getElementById('terminal-command');
   const outputEl = document.getElementById('terminal-output');
   const cursorEl = document.getElementById('terminal-cursor');
 
-  if (!lineEl || !commandEl || !outputEl || !cursorEl) throw new Error('Terminal elements not found');
+  if (!scrollEl || !lineEl || !commandEl || !outputEl || !cursorEl) throw new Error('Terminal elements not found');
 
   const typeSpeed = 70;
   const pauseAfterOutput = 2800;
   const pauseBeforeNext = 800;
-  const maxBlocks = 2;
+  const maxBlocks = 6;
 
   function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
+  }
+
+  function scrollToBottom() {
+    scrollEl.scrollTop = scrollEl.scrollHeight;
   }
 
   function escapeHtml(s) {
     const div = document.createElement('div');
     div.textContent = s;
     return div.innerHTML;
+  }
+
+  function colorize(text) {
+    return text.split('\n').map(function(line) {
+      const esc = escapeHtml(line);
+
+      // Terraform: + lines (additions)
+      if (/^\s*\+/.test(line))
+        return '<span class="term-green">' + esc + '</span>';
+      // Terraform: - lines (deletions)
+      if (/^\s*-/.test(line))
+        return '<span class="term-red">' + esc + '</span>';
+      // Terraform: ~ lines (changes)
+      if (/^\s*~/.test(line))
+        return '<span class="term-yellow">' + esc + '</span>';
+      // Plan/summary lines
+      if (/^Plan:/.test(line))
+        return '<span class="term-cyan font-bold">' + esc + '</span>';
+      // Comment lines (#)
+      if (/^\s*#/.test(line))
+        return '<span class="term-dim">' + esc + '</span>';
+
+      // Kubectl / Docker: header rows (NAME, CONTAINER ID, etc.)
+      if (/^(NAME|CONTAINER ID|PLAY |TASK )/.test(line))
+        return '<span class="term-white font-bold">' + esc + '</span>';
+      // Status: Running / Up
+      if (/Running|Up \d/.test(line))
+        return esc.replace(/(Running|Up\s+[\w\s]+)/g, '<span class="term-green">$1</span>');
+      // Ansible: ok / changed
+      if (/\bok[:=]/.test(line) || /\bchanged[:=]/.test(line))
+        return esc
+          .replace(/\b(ok(?:[:=]\s*\S+)?)/g, '<span class="term-green">$1</span>')
+          .replace(/\b(changed(?:[:=]\s*\S+)?)/g, '<span class="term-yellow">$1</span>');
+      // PLAY RECAP line
+      if (/^PLAY RECAP/.test(line))
+        return '<span class="term-cyan font-bold">' + esc + '</span>';
+      // Ansible task names in brackets
+      if (/^\s*TASK\s*\[/.test(line))
+        return '<span class="term-cyan">' + esc + '</span>';
+
+      // Git: branch name
+      if (/On branch/.test(line))
+        return esc.replace(/(main|master|develop|\S+)$/, '<span class="term-green font-bold">$1</span>');
+      // Git: up to date / clean
+      if (/up to date|nothing to commit|clean/.test(line))
+        return '<span class="term-green">' + esc + '</span>';
+
+      // Default: light gray (higher contrast than before)
+      return '<span class="term-muted">' + esc + '</span>';
+    }).join('\n');
   }
 
   function addBlock(cmd, output) {
@@ -74,17 +129,19 @@ const commands = [
     const block = document.createElement('div');
     block.className = 'terminal-block space-y-0.5';
     block.innerHTML =
-      '<div class="text-slate-400">' +
-      '<span class="text-slate-500">$</span> ' + escapeHtml(cmd) +
+      '<div>' +
+      '<span class="term-prompt font-bold">$</span> <span class="term-dim">' + escapeHtml(cmd) + '</span>' +
       '</div>' +
-      '<pre class="whitespace-pre overflow-x-auto text-xs text-slate-500">' + escapeHtml(output) + '</pre>';
+      '<pre class="whitespace-pre overflow-x-auto text-sm leading-relaxed">' + colorize(output) + '</pre>';
     lineEl.appendChild(block);
+    scrollToBottom();
   }
 
   async function typeCommand(cmd) {
     commandEl.textContent = '';
     for (const char of cmd) {
       commandEl.textContent += char;
+      scrollToBottom();
       await sleep(typeSpeed);
     }
   }
@@ -97,8 +154,9 @@ const commands = [
       const output = typeof item === 'string' ? '' : (item.output || '');
       await typeCommand(cmd);
       if (output) {
-        outputEl.textContent = output;
+        outputEl.innerHTML = colorize(output);
         outputEl.classList.remove('hidden');
+        scrollToBottom();
         await sleep(pauseAfterOutput);
       } else {
         await sleep(1200);
@@ -107,6 +165,7 @@ const commands = [
       commandEl.textContent = '';
       outputEl.textContent = '';
       outputEl.classList.add('hidden');
+      scrollToBottom();
       await sleep(pauseBeforeNext);
       index += 1;
     }

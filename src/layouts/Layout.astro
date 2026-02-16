@@ -39,7 +39,10 @@ const { title, description = "Tejas Bachhav – Cloud DevOps Engineer. Master's 
     <script>
       import { animate, stagger, inView } from 'motion';
 
-      if (typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      function initMotion() {
+        if (typeof window === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        /* ── Section & card fade-in ── */
         document.querySelectorAll('.motion-section').forEach((el) => {
           const h = el as HTMLElement;
           h.style.opacity = '0';
@@ -63,7 +66,96 @@ const { title, description = "Tejas Bachhav – Cloud DevOps Engineer. Master's 
           },
           { amount: 0.25 }
         );
+
+        /* ── Skill pill glow on scroll ── */
+        document.querySelectorAll('.skill-pill').forEach((pill) => {
+          inView(pill, () => { pill.classList.add('in-view'); }, { amount: 0.5 });
+        });
+
+        /* ── Icon pulse on scroll ── */
+        document.querySelectorAll('.icon-pulse').forEach((icon) => {
+          const el = icon as HTMLElement;
+          el.style.opacity = '0';
+          el.style.transform = 'scale(0.5)';
+          inView(icon, () => { icon.classList.add('in-view'); }, { amount: 0.5 });
+        });
+
+        /* ── Number counter animation ── */
+        document.querySelectorAll('[data-count-up]').forEach((el) => {
+          const target = parseInt(el.getAttribute('data-count-up') || '0', 10);
+          if (isNaN(target) || target === 0) return;
+          const htmlEl = el as HTMLElement;
+          inView(el, () => {
+            const obj = { val: 0 };
+            animate(obj, { val: target }, {
+              duration: 1.2,
+              ease: [0.16, 1, 0.3, 1],
+              onUpdate: () => { htmlEl.textContent = Math.round(obj.val).toString(); },
+            });
+          }, { amount: 0.5 });
+        });
+
+        /* ── Card tilt on hover (3D perspective) ── */
+        document.querySelectorAll('.tilt-card').forEach((card) => {
+          const el = card as HTMLElement;
+          el.style.perspective = '600px';
+
+          el.addEventListener('mousemove', (e: Event) => {
+            const me = e as MouseEvent;
+            const rect = el.getBoundingClientRect();
+            const x = me.clientX - rect.left;
+            const y = me.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -6;
+            const rotateY = ((x - centerX) / centerX) * 6;
+            el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+          });
+
+          el.addEventListener('mouseleave', () => {
+            el.style.transform = 'rotateX(0deg) rotateY(0deg)';
+          });
+        });
+
+        /* ── Magnetic hover on CTA buttons ── */
+        document.querySelectorAll('.magnetic-btn').forEach((btn) => {
+          const el = btn as HTMLElement;
+          el.addEventListener('mousemove', (e: Event) => {
+            const me = e as MouseEvent;
+            const rect = el.getBoundingClientRect();
+            const x = me.clientX - rect.left - rect.width / 2;
+            const y = me.clientY - rect.top - rect.height / 2;
+            el.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+          });
+          el.addEventListener('mouseleave', () => {
+            el.style.transform = 'translate(0px, 0px)';
+            el.style.transition = 'transform 0.3s ease';
+            setTimeout(() => { el.style.transition = ''; }, 300);
+          });
+        });
+
+        /* ── Parallax hero background ── */
+        const hero = document.getElementById('hero');
+        if (hero) {
+          let ticking = false;
+          window.addEventListener('scroll', () => {
+            if (!ticking) {
+              requestAnimationFrame(() => {
+                const scrollY = window.scrollY;
+                const heroH = hero.offsetHeight;
+                if (scrollY < heroH) {
+                  hero.style.backgroundPositionY = `${scrollY * 0.3}px`;
+                }
+                ticking = false;
+              });
+              ticking = true;
+            }
+          });
+        }
       }
+
+      initMotion();
+      document.addEventListener('astro:page-load', initMotion);
     </script>
   </body>
 </html>
