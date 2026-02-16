@@ -1,0 +1,150 @@
+---
+/**
+ * Global starfield — renders a fixed CSS star layer behind all content.
+ * Uses pure CSS so it loads instantly (no JS, no canvas).
+ * Place once in Layout.astro.
+ */
+---
+<div class="starfield-layer" aria-hidden="true">
+  <div class="stars-sm"></div>
+  <div class="stars-md"></div>
+  <div class="stars-lg"></div>
+  <div class="shooting-stars">
+    <span class="comet comet-1"></span>
+    <span class="comet comet-2"></span>
+    <span class="comet comet-3"></span>
+  </div>
+</div>
+
+<style>
+  .starfield-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Generate star fields using box-shadow (no JS needed) */
+  .stars-sm, .stars-md, .stars-lg {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+  }
+
+  /* Small stars — dense, dim */
+  .stars-sm {
+    width: 1px; height: 1px;
+    box-shadow:
+      80px 120px #ffffff20, 250px 40px #ffffff18, 430px 200px #ffffff15,
+      620px 90px #ffffff20, 780px 310px #ffffff12, 900px 50px #ffffff18,
+      1100px 180px #ffffff14, 1300px 280px #ffffff20, 150px 400px #ffffff16,
+      340px 520px #ffffff12, 550px 600px #ffffff18, 700px 480px #ffffff14,
+      870px 700px #ffffff20, 1050px 560px #ffffff16, 1200px 420px #ffffff12,
+      60px 750px #ffffff18, 230px 680px #ffffff14, 420px 800px #ffffff20,
+      610px 720px #ffffff16, 800px 850px #ffffff12, 950px 780px #ffffff18,
+      1150px 700px #ffffff14, 1350px 620px #ffffff20, 100px 920px #ffffff16,
+      300px 1000px #ffffff12, 500px 950px #ffffff18, 680px 1050px #ffffff14,
+      1400px 150px #ffffff18, 1500px 500px #ffffff14, 1600px 800px #ffffff20,
+      1700px 300px #ffffff12, 1800px 650px #ffffff16, 1900px 100px #ffffff14,
+      170px 1100px #ffffff18, 350px 1200px #ffffff14, 530px 1150px #ffffff20;
+    animation: drift-stars 120s linear infinite;
+  }
+
+  /* Medium stars — moderate, slightly brighter */
+  .stars-md {
+    width: 1.5px; height: 1.5px;
+    box-shadow:
+      180px 80px #c8dcff30, 480px 250px #ffeedd28, 750px 120px #c8e6ff30,
+      1000px 350px #ffffff28, 1250px 50px #c8dcff30, 200px 550px #e8d0ff28,
+      500px 700px #c8e6ff30, 780px 500px #ffeedd28, 1100px 630px #ffffff30,
+      1380px 400px #c8dcff28, 90px 850px #e8d0ff30, 350px 900px #c8e6ff28,
+      650px 830px #ffffff30, 900px 950px #ffeedd28, 1200px 750px #c8dcff30,
+      1450px 900px #c8e6ff28, 100px 1100px #e8d0ff30, 400px 1050px #ffffff28,
+      1550px 200px #c8dcff30, 1700px 600px #ffeedd28, 1850px 400px #e8d0ff30;
+    animation: drift-stars 90s linear infinite;
+  }
+
+  /* Large stars — few, bright, with glow */
+  .stars-lg {
+    width: 2px; height: 2px;
+    box-shadow:
+      350px 180px #ffffff50, 800px 400px #a5d8ff40, 1100px 200px #ffffff50,
+      450px 650px #c8b6ff40, 900px 780px #ffffff50, 1300px 550px #a5d8ff40,
+      200px 900px #ffffff50, 700px 1000px #c8b6ff40, 1500px 350px #ffffff50,
+      1650px 700px #a5d8ff40, 1800px 150px #c8b6ff50;
+    animation: drift-stars 60s linear infinite, twinkle-field 4s ease-in-out infinite alternate;
+  }
+
+  @keyframes drift-stars {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100px); }
+  }
+
+  @keyframes twinkle-field {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+
+  /* ── Shooting stars / comets ── */
+  .shooting-stars {
+    position: absolute;
+    inset: 0;
+  }
+
+  .comet {
+    position: absolute;
+    width: 80px;
+    height: 1.5px;
+    background: linear-gradient(to right, rgba(6, 182, 212, 0), rgba(6, 182, 212, 0.7), rgba(255, 255, 255, 0.9));
+    border-radius: 50%;
+    opacity: 0;
+    transform: rotate(-35deg);
+    filter: blur(0.3px);
+  }
+
+  .comet::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 6px 2px rgba(6, 182, 212, 0.5);
+  }
+
+  .comet-1 {
+    top: 12%;
+    left: -100px;
+    animation: shoot 40s linear 8s infinite;
+  }
+  .comet-2 {
+    top: 35%;
+    left: -100px;
+    width: 100px;
+    animation: shoot 50s linear 24s infinite;
+    transform: rotate(-25deg);
+  }
+  .comet-3 {
+    top: 55%;
+    left: -100px;
+    width: 60px;
+    animation: shoot 45s linear 40s infinite;
+    transform: rotate(-40deg);
+  }
+
+  @keyframes shoot {
+    0% { opacity: 0; transform: translateX(0) rotate(-35deg); }
+    1% { opacity: 0.8; }
+    50% { opacity: 0.8; transform: translateX(calc(100vw + 200px)) rotate(-35deg); }
+    50.1%, 100% { opacity: 0; transform: translateX(calc(100vw + 200px)) rotate(-35deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stars-sm, .stars-md, .stars-lg { animation: none; }
+    .comet { display: none; }
+  }
+</style>

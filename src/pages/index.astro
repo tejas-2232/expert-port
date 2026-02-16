@@ -53,16 +53,17 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
   </section>
 
   {/* Terminal — separated from hero so the 3D scene is visible */}
-  <section class="border-t border-slate-800/50 bg-gradient-to-b from-slate-950 to-slate-900/80 px-4 py-10 sm:px-6 sm:py-14">
-    <div class="mx-auto max-w-2xl">
+  <section class="relative border-t border-slate-800/30 bg-slate-950/60 px-4 py-10 sm:px-6 sm:py-14">
+    <ParticleBackground density="low" />
+    <div class="relative z-10 mx-auto max-w-2xl">
       <Terminal />
     </div>
   </section>
 
   <WaveDivider color="text-slate-900/50" />
 
-  <section class="relative bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
-    <ParticleBackground class="pointer-events-auto" />
+  <section class="nebula-glow nebula-cyan relative bg-slate-950/60 px-4 py-12 sm:px-6 sm:py-16">
+    <ParticleBackground class="pointer-events-auto" density="high" />
     <div class="relative z-10 mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">About</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Let me introduce myself.</h2>
@@ -118,8 +119,9 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
 
   <WaveDivider color="text-slate-950" />
 
-  <section id="certifications" class="motion-section bg-slate-950 px-4 py-12 sm:px-6 sm:py-16">
-    <div class="mx-auto max-w-5xl">
+  <section id="certifications" class="motion-section nebula-glow nebula-purple relative bg-slate-950/70 px-4 py-12 sm:px-6 sm:py-16">
+    <ParticleBackground density="low" />
+    <div class="relative z-10 mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">Credentials</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Certifications & Badges</h2>
       <p class="mt-2 text-slate-400">Cloud and DevOps certifications with verification links.</p>
@@ -144,8 +146,9 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
     </div>
   </section>
 
-  <section id="talks" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
-    <div class="mx-auto max-w-5xl">
+  <section id="talks" class="motion-section nebula-glow nebula-pink relative border-t border-slate-800/30 bg-slate-950/50 px-4 py-12 sm:px-6 sm:py-16">
+    <ParticleBackground density="medium" />
+    <div class="relative z-10 mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">Speaking</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Talks & Workshops</h2>
       <p class="mt-2 text-slate-400">Presentations at meetups and campus events.</p>
@@ -198,8 +201,9 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
     </div>
   </section>
 
-  <section id="opensource" class="motion-section border-t border-slate-800/50 bg-slate-950 px-4 py-12 sm:px-6 sm:py-16">
-    <div class="mx-auto max-w-5xl">
+  <section id="opensource" class="motion-section nebula-glow nebula-blue relative border-t border-slate-800/30 bg-slate-950/70 px-4 py-12 sm:px-6 sm:py-16">
+    <ParticleBackground density="low" />
+    <div class="relative z-10 mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-400">Community</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Open Source</h2>
       <p class="mt-2 text-slate-400">Repos I maintain, contributions, and HacktoberFest.</p>
@@ -230,8 +234,9 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
     </div>
   </section>
 
-  <section id="activity" class="motion-section border-t border-slate-800/50 bg-slate-900/50 px-4 py-12 sm:px-6 sm:py-16">
-    <div class="mx-auto max-w-5xl">
+  <section id="activity" class="motion-section nebula-glow nebula-cyan relative border-t border-slate-800/30 bg-slate-950/50 px-4 py-12 sm:px-6 sm:py-16">
+    <ParticleBackground density="medium" />
+    <div class="relative z-10 mx-auto max-w-5xl">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent">GitHub</p>
       <h2 class="mt-2 text-3xl font-bold text-slate-100">Profile & Contributions</h2>
       <p class="mt-2 text-slate-400">Public stats and activity, kept fresh automatically.</p>
@@ -373,8 +378,9 @@ const monthLabelMap = new Map(heatmap.monthLabels.map(m => [m.colIndex, m.label]
     </div>
   </section>
 
-  <section class="motion-section border-t border-slate-800/50 bg-gradient-to-b from-slate-800/30 to-slate-950 px-4 py-12 sm:px-6 sm:py-16">
-    <div class="mx-auto max-w-5xl">
+  <section class="motion-section nebula-glow nebula-purple relative border-t border-slate-800/30 bg-slate-950/40 px-4 py-12 sm:px-6 sm:py-16">
+    <ParticleBackground density="low" />
+    <div class="relative z-10 mx-auto max-w-5xl">
       <div class="grid gap-8 sm:grid-cols-3 text-center">
         {stats.map(({ value, label }, i) => {
           const colors = [

@@ -144,6 +144,67 @@ html.light .from-amber-950\/20 { --tw-gradient-from: rgba(254, 243, 199, 0.4); }
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* ── Space-themed section backgrounds ── */
+.space-section {
+  position: relative;
+  background: transparent;
+}
+.space-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.75);
+  pointer-events: none;
+  z-index: 0;
+}
+.space-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Nebula glow accents (placed on sections) */
+.nebula-glow {
+  position: relative;
+  overflow: hidden;
+}
+.nebula-glow::after {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+}
+.nebula-cyan::after {
+  background: #06b6d4;
+  top: -100px;
+  right: -150px;
+}
+.nebula-purple::after {
+  background: #8b5cf6;
+  bottom: -100px;
+  left: -150px;
+}
+.nebula-pink::after {
+  background: #ec4899;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.nebula-blue::after {
+  background: #3b82f6;
+  top: -100px;
+  left: -100px;
+}
+
+/* Light theme: hide space effects */
+html.light .starfield-layer { display: none; }
+html.light .nebula-glow::after { display: none; }
+html.light .space-section::before { background: transparent; }
+
 /* ── Card tilt 3D perspective ── */
 .tilt-card {
   transform-style: preserve-3d;

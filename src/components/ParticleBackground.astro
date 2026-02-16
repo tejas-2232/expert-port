@@ -1,128 +1,243 @@
 ---
 interface Props {
   class?: string;
+  density?: 'low' | 'medium' | 'high';
 }
-const { class: className = '' } = Astro.props;
+const { class: className = '', density = 'medium' } = Astro.props;
 ---
-<div class:list={["particle-bg-wrap absolute inset-0 overflow-hidden", className]} aria-hidden="true">
-  <canvas class="particle-canvas block h-full w-full" data-particle-canvas></canvas>
+<div class:list={["space-bg-wrap absolute inset-0 overflow-hidden", className]} aria-hidden="true" data-density={density}>
+  <canvas class="space-canvas block h-full w-full" data-space-canvas></canvas>
 </div>
 
 <script>
-  function initParticles(canvas: HTMLCanvasElement) {
+  function initSpace(canvas: HTMLCanvasElement) {
+    if (canvas.dataset.initialized) return;
+    canvas.dataset.initialized = '1';
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
 
-    let width = 0;
-    let height = 0;
+    const wrap = canvas.closest('.space-bg-wrap') as HTMLElement;
+    const densityAttr = wrap?.dataset.density || 'medium';
+    const starMult = densityAttr === 'high' ? 1.6 : densityAttr === 'low' ? 0.5 : 1;
+
+    let W = 0, H = 0;
     let animId = 0;
-    let mouseX = -9999;
-    let mouseY = -9999;
+    let mouseX = -9999, mouseY = -9999;
+    let time = 0;
 
-    interface Particle {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      r: number;
-      opacity: number;
+    /* ── Stars ── */
+    interface Star {
+      x: number; y: number;
+      r: number;           // radius 0.3 – 2.5
+      baseAlpha: number;   // brightness 0.2 – 1
+      twinkleSpeed: number;
+      twinkleOffset: number;
+      color: string;       // warm white / blue-white / cyan
+      vx: number; vy: number;
     }
+    const stars: Star[] = [];
+    const STAR_COLORS = [
+      '255,255,255',   // white
+      '200,220,255',   // blue-white
+      '180,230,255',   // cool white
+      '255,240,200',   // warm white
+      '130,220,255',   // cyan
+      '200,180,255',   // lavender
+    ];
 
-    const particles: Particle[] = [];
-    const PARTICLE_COUNT = 55;
-    const CONNECT_DIST = 120;
-    const MOUSE_DIST = 100;
+    /* ── Shooting stars / comets ── */
+    interface Comet {
+      x: number; y: number;
+      vx: number; vy: number;
+      len: number;
+      life: number; maxLife: number;
+      width: number;
+      color: string;
+    }
+    const comets: Comet[] = [];
+    let nextCometTime = 2000 + Math.random() * 3000;
+
+    /* ── Nebula blobs (soft glowing circles) ── */
+    interface Nebula {
+      x: number; y: number;
+      r: number;
+      color: string;
+      alpha: number;
+      driftX: number; driftY: number;
+    }
+    const nebulae: Nebula[] = [];
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      width = rect.width;
-      height = rect.height;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      W = rect.width; H = rect.height;
+      canvas.width = W * dpr; canvas.height = H * dpr;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    function createParticles() {
-      particles.length = 0;
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
-          r: Math.random() * 1.5 + 0.5,
-          opacity: Math.random() * 0.4 + 0.15,
+    function populate() {
+      stars.length = 0;
+      const count = Math.floor((W * H) / 4000 * starMult);
+      for (let i = 0; i < count; i++) {
+        const isBright = Math.random() < 0.08;
+        stars.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: isBright ? 1.2 + Math.random() * 1.5 : 0.3 + Math.random() * 1,
+          baseAlpha: isBright ? 0.7 + Math.random() * 0.3 : 0.15 + Math.random() * 0.5,
+          twinkleSpeed: 0.5 + Math.random() * 2,
+          twinkleOffset: Math.random() * Math.PI * 2,
+          color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+          vx: (Math.random() - 0.5) * 0.02,
+          vy: (Math.random() - 0.5) * 0.02,
+        });
+      }
+
+      nebulae.length = 0;
+      const nebulaColors = [
+        'rgba(6, 182, 212, 0.03)',    // cyan
+        'rgba(139, 92, 246, 0.025)',   // purple
+        'rgba(59, 130, 246, 0.02)',    // blue
+        'rgba(236, 72, 153, 0.015)',   // pink
+      ];
+      const nebulaCount = Math.max(2, Math.floor(W / 300));
+      for (let i = 0; i < nebulaCount; i++) {
+        nebulae.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: 80 + Math.random() * 200,
+          color: nebulaColors[i % nebulaColors.length],
+          alpha: 1,
+          driftX: (Math.random() - 0.5) * 0.05,
+          driftY: (Math.random() - 0.5) * 0.05,
         });
       }
     }
 
+    function spawnComet() {
+      const fromLeft = Math.random() < 0.5;
+      const angle = (Math.PI / 8) + Math.random() * (Math.PI / 4);
+      const speed = 1.2 + Math.random() * 1.5;
+      comets.push({
+        x: fromLeft ? -20 : W + 20,
+        y: Math.random() * H * 0.6,
+        vx: fromLeft ? Math.cos(angle) * speed : -Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        len: 50 + Math.random() * 100,
+        life: 0,
+        maxLife: 120 + Math.random() * 80,
+        width: 1 + Math.random() * 1.5,
+        color: Math.random() < 0.5 ? '6, 182, 212' : '200, 220, 255',
+      });
+    }
+
     function draw() {
-      ctx!.clearRect(0, 0, width, height);
+      ctx!.clearRect(0, 0, W, H);
+      time++;
 
-      for (let i = 0; i < particles.length; i++) {
-        const a = particles[i];
+      /* ── Nebula blobs ── */
+      for (const n of nebulae) {
+        n.x += n.driftX;
+        n.y += n.driftY;
+        if (n.x < -n.r) n.x = W + n.r;
+        if (n.x > W + n.r) n.x = -n.r;
+        if (n.y < -n.r) n.y = H + n.r;
+        if (n.y > H + n.r) n.y = -n.r;
 
-        // Mouse repulsion
-        const dmx = a.x - mouseX;
-        const dmy = a.y - mouseY;
-        const distMouse = Math.sqrt(dmx * dmx + dmy * dmy);
-        if (distMouse < MOUSE_DIST && distMouse > 0) {
-          const force = (MOUSE_DIST - distMouse) / MOUSE_DIST * 0.8;
-          a.vx += (dmx / distMouse) * force;
-          a.vy += (dmy / distMouse) * force;
-        }
+        const grad = ctx!.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+        grad.addColorStop(0, n.color);
+        grad.addColorStop(1, 'transparent');
+        ctx!.fillStyle = grad;
+        ctx!.fillRect(n.x - n.r, n.y - n.r, n.r * 2, n.r * 2);
+      }
 
-        // Damping
-        a.vx *= 0.98;
-        a.vy *= 0.98;
+      /* ── Stars ── */
+      for (const s of stars) {
+        s.x += s.vx;
+        s.y += s.vy;
+        if (s.x < -5) s.x = W + 5;
+        if (s.x > W + 5) s.x = -5;
+        if (s.y < -5) s.y = H + 5;
+        if (s.y > H + 5) s.y = -5;
 
-        // Keep minimum speed
-        const speed = Math.sqrt(a.vx * a.vx + a.vy * a.vy);
-        if (speed < 0.1) {
-          a.vx += (Math.random() - 0.5) * 0.05;
-          a.vy += (Math.random() - 0.5) * 0.05;
-        }
-
-        a.x += a.vx;
-        a.y += a.vy;
-
-        // Wrap around
-        if (a.x < -10) a.x = width + 10;
-        if (a.x > width + 10) a.x = -10;
-        if (a.y < -10) a.y = height + 10;
-        if (a.y > height + 10) a.y = -10;
-
-        // Draw dot
-        ctx!.beginPath();
-        ctx!.arc(a.x, a.y, a.r, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(6, 182, 212, ${a.opacity})`;
-        ctx!.fill();
-
-        // Connect nearby particles
-        for (let j = i + 1; j < particles.length; j++) {
-          const b = particles[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
+        // Mouse attraction (gentle pull)
+        if (mouseX > 0) {
+          const dx = mouseX - s.x, dy = mouseY - s.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < CONNECT_DIST) {
-            const lineOpacity = (1 - dist / CONNECT_DIST) * 0.12;
-            ctx!.beginPath();
-            ctx!.moveTo(a.x, a.y);
-            ctx!.lineTo(b.x, b.y);
-            ctx!.strokeStyle = `rgba(6, 182, 212, ${lineOpacity})`;
-            ctx!.lineWidth = 0.5;
-            ctx!.stroke();
+          if (dist < 150 && dist > 0) {
+            const pull = (150 - dist) / 150 * 0.15;
+            s.x += (dx / dist) * pull;
+            s.y += (dy / dist) * pull;
           }
         }
+
+        const twinkle = prefersReduced ? 1 :
+          0.5 + 0.5 * Math.sin(time * 0.03 * s.twinkleSpeed + s.twinkleOffset);
+        const alpha = s.baseAlpha * twinkle;
+
+        ctx!.beginPath();
+        ctx!.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx!.fillStyle = `rgba(${s.color}, ${alpha})`;
+        ctx!.fill();
+
+        // Bright stars get a soft glow
+        if (s.r > 1.5) {
+          ctx!.beginPath();
+          ctx!.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+          ctx!.fillStyle = `rgba(${s.color}, ${alpha * 0.08})`;
+          ctx!.fill();
+        }
+      }
+
+      /* ── Comets / shooting stars ── */
+      for (let i = comets.length - 1; i >= 0; i--) {
+        const c = comets[i];
+        c.x += c.vx;
+        c.y += c.vy;
+        c.life++;
+
+        const progress = c.life / c.maxLife;
+        const fadeIn = Math.min(progress * 4, 1);
+        const fadeOut = Math.max(1 - (progress - 0.6) / 0.4, 0);
+        const alpha = fadeIn * fadeOut;
+
+        if (alpha <= 0 || c.life > c.maxLife) {
+          comets.splice(i, 1);
+          continue;
+        }
+
+        // Tail (gradient line)
+        const tailX = c.x - (c.vx / Math.sqrt(c.vx * c.vx + c.vy * c.vy)) * c.len * alpha;
+        const tailY = c.y - (c.vy / Math.sqrt(c.vx * c.vx + c.vy * c.vy)) * c.len * alpha;
+
+        const grad = ctx!.createLinearGradient(c.x, c.y, tailX, tailY);
+        grad.addColorStop(0, `rgba(${c.color}, ${alpha * 0.9})`);
+        grad.addColorStop(1, `rgba(${c.color}, 0)`);
+
+        ctx!.beginPath();
+        ctx!.moveTo(tailX, tailY);
+        ctx!.lineTo(c.x, c.y);
+        ctx!.strokeStyle = grad;
+        ctx!.lineWidth = c.width;
+        ctx!.lineCap = 'round';
+        ctx!.stroke();
+
+        // Head glow
+        ctx!.beginPath();
+        ctx!.arc(c.x, c.y, c.width + 1, 0, Math.PI * 2);
+        ctx!.fillStyle = `rgba(${c.color}, ${alpha * 0.6})`;
+        ctx!.fill();
+      }
+
+      // Spawn new comets periodically
+      if (!prefersReduced && time > nextCometTime) {
+        spawnComet();
+        nextCometTime = time + 200 + Math.random() * 400;
       }
     }
 
     let isVisible = true;
-
     function animate() {
       if (isVisible) draw();
       animId = requestAnimationFrame(animate);
@@ -134,34 +249,25 @@ const { class: className = '' } = Astro.props;
     );
     observer.observe(canvas);
 
-    const parent = canvas.closest('.particle-bg-wrap');
-    parent?.addEventListener('mousemove', (e: Event) => {
+    wrap?.addEventListener('mousemove', (e: Event) => {
       const me = e as MouseEvent;
       const rect = canvas.getBoundingClientRect();
       mouseX = me.clientX - rect.left;
       mouseY = me.clientY - rect.top;
-    });
-    parent?.addEventListener('mouseleave', () => {
-      mouseX = -9999;
-      mouseY = -9999;
-    });
+    }, { passive: true });
+    wrap?.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
 
-    const ro = new ResizeObserver(() => {
-      resize();
-      if (particles.length === 0) createParticles();
-    });
+    const ro = new ResizeObserver(() => { resize(); populate(); });
     ro.observe(canvas);
 
-    resize();
-    createParticles();
-    animate();
+    resize(); populate(); animate();
 
-    return () => {
-      cancelAnimationFrame(animId);
-      observer.disconnect();
-      ro.disconnect();
-    };
+    return () => { cancelAnimationFrame(animId); observer.disconnect(); ro.disconnect(); };
   }
 
-  document.querySelectorAll<HTMLCanvasElement>('[data-particle-canvas]').forEach(initParticles);
+  function init() {
+    document.querySelectorAll<HTMLCanvasElement>('[data-space-canvas]').forEach(initSpace);
+  }
+  init();
+  document.addEventListener('astro:page-load', init);
 </script>
